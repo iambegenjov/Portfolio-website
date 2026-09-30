@@ -23,7 +23,12 @@ docs/                      Handoff notes, design references, original full-size 
 preview.command            Double-click to preview locally
 ```
 
-## Add or change a project
+## Admin panel (live)
+
+Open `/admin/` on the live site. The first time, connect it to GitHub with a fine-grained access token (github.com › Settings › Developer settings › Fine-grained tokens: only this repository, Repository permissions › Contents: Read and write). The token is stored only in that browser.
+Then add, edit, reorder or remove projects; each save is published as a commit and the site updates about a minute later.
+
+## Add or change a project by hand
 
 1. Create `projects/<slug>/` (lowercase, dashes, e.g. `new-project`).
 2. Add `project.json` and the photos next to it:

@@ -8,7 +8,7 @@ Portfolio website for Muhammet Begenjov. Static site for GitHub Pages, no build 
 - `index.html`: markup only (home sections + an empty `<article class="project">` filled for project pages).
 - `assets/css/main.css`, `assets/js/main.js`: all styles and behaviour. The project loader at the end of main.js reads `projects/index.json` and each `projects/<slug>/project.json`, builds the Works cards and renders project pages at `#/work/<slug>`.
 - `projects/<slug>/`: one folder per project with `project.json` and its photos. Image paths in project.json are relative to that folder.
-- `admin/index.html`: admin panel. It still exports the old single-file format; it is being rebuilt to publish to GitHub (the owner chose a "live admin" on GitHub Pages).
+- `admin/index.html`: live admin. It connects to the GitHub repository with a fine-grained token (Contents: read and write, stored only in the browser), reads `projects/` through the GitHub API and publishes each save as one commit (Git Data API: blobs, tree, commit, ref). New images get unique names (`card-<id>.jpg`); images no longer used by a project are deleted in the same commit. Without a connection it shows `../projects` read-only.
 - `docs/`: handoff notes, design reference screenshots (`docs/reference/`), full-size source photos (`docs/source-photos/`, not used by the site).
 
 ## Run it
