@@ -1,0 +1,34 @@
+{
+  "title": "Al Basma",
+  "category": "Automotive Retail",
+  "year": "2025",
+  "tags": [
+    "Retail & Environments"
+  ],
+  "services": [
+    "Retail Environment",
+    "Wayfinding",
+    "Signage",
+    "Visual Identity",
+    "Print",
+    "Art Direction"
+  ],
+  "description": "A retail and gallery experience for a Lexus showroom.\n\nAl Basma needed a space that made a premium car brand feel earned rather than announced. The design keeps the cars at the centre and lets materials and light do the rest.\n\nWayfinding, signage and printed pieces follow the same calm, precise language as the showroom itself.",
+  "card": "card.jpg",
+  "cover": "cover.jpg",
+  "gallery": [
+    {
+      "type": "single",
+      "images": [
+        "cover.jpg"
+      ]
+    },
+    {
+      "type": "split",
+      "images": [
+        "card.jpg",
+        "detail.jpg"
+      ]
+    }
+  ]
+}

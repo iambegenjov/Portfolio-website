@@ -1,0 +1,35 @@
+{
+  "title": "Yupek Yoly",
+  "category": "Education",
+  "year": "2026",
+  "tags": [
+    "Brand & Identity"
+  ],
+  "services": [
+    "Brand Strategy",
+    "Visual Identity",
+    "Logo Design",
+    "Typography",
+    "Signage",
+    "Print",
+    "Tone of Voice"
+  ],
+  "description": "An identity for an education centre bringing Chinese-language studies to Turkmenistan.\n\nYupek Yoly takes its name from the Silk Road, the route that once connected Central Asia and China. The identity picks up that idea of connection: a clear, confident system that feels at home in both cultures.\n\nThe work covers the logo, typography, colour and the everyday pieces students actually see, from course materials to signage in the centre.",
+  "card": "card.jpg",
+  "cover": "cover.jpg",
+  "gallery": [
+    {
+      "type": "single",
+      "images": [
+        "cover.jpg"
+      ]
+    },
+    {
+      "type": "split",
+      "images": [
+        "card.jpg",
+        "detail.jpg"
+      ]
+    }
+  ]
+}
