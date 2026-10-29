@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "preview": "PREVIEW_EXPORT=1 next build && node scripts/preview.mjs"
+    "preview": "node scripts/preview-build.mjs && node scripts/preview.mjs"
   },
   "dependencies": {
     "next": "^15.5.0",

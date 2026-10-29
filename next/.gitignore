@@ -7,3 +7,4 @@ preview/
 preview-files.json
 .vercel
 .env*
+.api-preview-aside/

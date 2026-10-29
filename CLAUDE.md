@@ -12,7 +12,7 @@ Portfolio website for Muhammet Begenjov, built with Next.js (App Router) in `nex
 - `next/public/projects/<slug>/`: `project.json` + photos. Image paths in project.json are relative to that folder.
 - `docs/`: handoff notes, design references (`docs/reference/`), full-size source photos (`docs/source-photos/`, incl. the original AGI 2025 HEIC files), not used by the site.
 - `next/public/events/index.json` + `events/<slug>/event.json` (title, story, photos [{file, ratio, alt}]) feed the Events sections; `next/public/site.json` holds contact links and the yellow CTA text (`lib/site.js`).
-- `next/public/admin/index.html`: admin panel at `/admin` (Projects, Events, Contact tabs), behind a password. It publishes each save as one commit under `next/public/` through `next/app/api/admin/*` (route files are named `route.api.js` so the static preview build skips them); the server holds the GitHub token (`lib/admin-auth.js`, Vercel env vars ADMIN_PASSWORD and GITHUB_TOKEN, optional GITHUB_REPO / GITHUB_BRANCH). Vercel rebuilds after each commit.
+- `next/public/admin/index.html`: admin panel at `/admin` (Projects, Events, Contact tabs), behind a password. It publishes each save as one commit under `next/public/` through `next/app/api/admin/*` (`npm run preview` sets app/api aside, since a static export cannot include it); the server holds the GitHub token (`lib/admin-auth.js`, Vercel env vars ADMIN_PASSWORD and GITHUB_TOKEN, optional GITHUB_REPO / GITHUB_BRANCH). Vercel rebuilds after each commit.
 - The old static site (index.html, assets/, projects/, old admin/, preview.command) was removed on 2026-10-29; it is in git history.
 
 ## Run it
