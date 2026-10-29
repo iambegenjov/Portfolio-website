@@ -1,11 +1,5 @@
-/* Muhammet Begenjov portfolio: site styles */
-@font-face{
-  font-family:'Faculty Glyphic';
-  src:url('../fonts/FacultyGlyphic-Regular.ttf') format('truetype');
-  font-weight:400;
-  font-style:normal;
-  font-display:swap;
-}
+/* Muhammet Begenjov portfolio: site styles.
+   Fonts come from next/font (layout.js): --font-display = Faculty Glyphic, --font-body = Inter. */
 :root{
   --bg:#f5f3ee;
   --ink:#15100c;
@@ -27,11 +21,11 @@ body{
   margin:0;
   background:var(--bg);
   color:var(--ink);
-  font-family:'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family:var(--font-body), -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing:antialiased;
 }
 h1,h2,h3{
-  font-family:'Faculty Glyphic', Georgia, 'Times New Roman', serif;
+  font-family:var(--font-display), Georgia, 'Times New Roman', serif;
   font-weight:400;
   margin:0;
   letter-spacing:-.01em;
@@ -57,7 +51,7 @@ nav.nav-hidden{ transform:translateY(-100%); }
   padding:26px 40px; max-width:1400px; margin:0 auto;
 }
 @media (max-width:700px){ .nav-row{padding:18px 20px;} }
-.logo{font-family:'Inter',sans-serif; font-weight:600; font-size:14px; letter-spacing:.03em; display:flex; align-items:center;}
+.logo{font-family:var(--font-body),sans-serif; font-weight:600; font-size:14px; letter-spacing:.03em; display:flex; align-items:center;}
 .logo-mark{height:28px; width:auto; color:var(--ink); transition:color .5s ease;}
 body.is-dark .logo-mark{color:var(--dark-ink);}
 @media (max-width:700px){ .logo-mark{height:19px;} }
@@ -67,7 +61,10 @@ body.is-dark .burger span{background:var(--dark-ink);}
 .burger span:first-child{top:0;} .burger span:last-child{bottom:0;}
 
 /* HERO */
-.hero{padding:80px 0 60px; min-height:90vh; display:flex; flex-direction:column; justify-content:space-between;}
+.hero{position:relative; min-height:90vh; display:flex; overflow:hidden;}
+.hero-inner{position:relative; z-index:1; flex:1; width:100%; padding-top:80px; padding-bottom:60px; display:flex; flex-direction:column; justify-content:space-between;}
+.not-found{flex-direction:column; justify-content:center; gap:40px; padding:120px 40px;}
+.not-found .hero-mid{flex:none;}
 .hero-mid{flex:1; display:flex; align-items:center; justify-content:center; text-align:center;}
 .hero h1{
   font-size:clamp(26px, 4vw, 60px);
@@ -106,7 +103,6 @@ body.is-dark .studies .eyebrow{color:var(--dark-muted);}
 /* SERVICES */
 .services{padding:110px 0;}
 .services h2{font-size:clamp(28px,4vw,48px); line-height:1.18; max-width:780px;}
-.pill.cta{margin-top:40px;}
 .rows{position:relative; margin-top:70px; border-top:1px solid var(--line);}
 .row{
   position:relative;
@@ -145,7 +141,6 @@ body.is-dark .studies .eyebrow{color:var(--dark-muted);}
 .row:hover p{ color:rgba(245,243,238,.72); }
 .row:hover .arrow{ opacity:1; transform:translateY(-50%) translateX(0); }
 @media (max-width:700px){ .row{grid-template-columns:1fr;} }
-.all-link{margin-top:26px; display:inline-flex; gap:8px; align-items:center; font-size:15px;}
 
 /* CASE STUDIES */
 .studies{background:var(--bg); color:var(--ink); padding:110px 0 60px; transition:background-color .5s ease, color .5s ease;}
@@ -181,15 +176,16 @@ body.is-dark .studies-sub{color:var(--dark-muted);}
   clip-path:inset(0 0 0 0 round 16px);
   transition:clip-path .4s cubic-bezier(.2,.7,.2,1) .05s;
 }
-/* The photo itself drifts up slightly inside the mask (extra 24px below keeps it covered) */
-.card-img::before{
-  content:""; position:absolute; left:0; right:0; top:0; bottom:-24px;
-  background-image:var(--img); background-size:cover; background-position:center;
+/* The photo itself drifts up slightly inside the mask (extra 24px below keeps it covered).
+   Inline background-image on the element, so the URL resolves against the page, not the stylesheet. */
+.card-pic{
+  position:absolute; left:0; right:0; top:0; bottom:-24px;
+  background-size:cover; background-position:center;
   background-color:rgba(21,16,12,.08);
   transition:transform .4s cubic-bezier(.2,.7,.2,1) .05s;
 }
 .card:hover .card-img{clip-path:inset(0 0 80px 0 round 16px); transition-delay:0s;}
-.card:hover .card-img::before{transform:translateY(-22px); transition:transform .4s cubic-bezier(.2,.7,.2,1);}
+.card:hover .card-pic{transform:translateY(-22px); transition:transform .4s cubic-bezier(.2,.7,.2,1);}
 /* Text block is bottom-aligned so its last line ends on the card's bottom edge, level with non-hovered cards */
 .card-info{
   position:absolute; left:0; right:0; bottom:0; height:80px; z-index:1;
@@ -220,7 +216,7 @@ body.is-dark .card-info p{color:var(--dark-muted);}
 /* Touch screens have no hover: show the lifted state with text all the time */
 @media (hover:none){
   .card .card-img{clip-path:inset(0 0 80px 0 round 16px);}
-  .card .card-img::before{transform:translateY(-22px);}
+  .card .card-pic{transform:translateY(-22px);}
   .card .card-info{opacity:1; transform:none;}
   .card .card-arrow{opacity:1; transform:none;}
 }
@@ -236,32 +232,22 @@ body.is-dark .card-info p{color:var(--dark-muted);}
 }
 body.is-dark .page{background:var(--dark-bg);}
 
-/* PROJECT PAGES (one view per project, shown by the router script at #/work/<slug>).
-   Layout follows fiasco.design/work/boundless: full-screen photo held in place while a light
-   panel with rounded top corners slides up over it; inside, the intro text on the left and
-   category pills + services on the right. */
-[hidden]{display:none !important;}
+/* PROJECT PAGES (app/work/[slug]). Layout follows fiasco.design/work/boundless without the cover photo:
+   intro text on the left, category pills on the right, then the image rows. */
 /* Behind the yellow panel's rounded bottom corners the dark footer colour must show, as on the home page */
 body.on-project{background:var(--dark-bg);}
 a.card{display:block; color:inherit;}
-.project{margin-top:calc(-1 * var(--nav-h, 0px));}
-.pj-hero{
-  position:sticky; top:0; z-index:0; height:75vh; min-height:420px;
-  background-image:var(--hero, var(--img)); background-size:cover; background-position:center;
-  background-color:var(--dark-bg);
-}
 .pj-panel{
-  position:relative; z-index:1; margin-top:-80px; padding:80px 0 130px;
+  position:relative; z-index:1; padding:80px 0 130px;
   background:var(--bg); color:var(--ink);
-  border-radius:40px 40px 32px 32px;
-  box-shadow:0 -20px 80px 0 rgba(0,0,0,.08); /* shadow on the photo only, none onto the yellow panel below */
+  border-radius:0 0 32px 32px;
 }
 .pj-intro{display:grid; grid-template-columns:15.2fr 45.3fr 9.2fr 15fr 15.2fr;}
 /* Title on its own row, so the side column starts level with the description */
 .pj-intro > .pj-headline{grid-column:2; grid-row:1;}
 .pj-main{grid-column:2; grid-row:2;}
 .pj-side{grid-column:4; grid-row:2;}
-.pj-name{font-family:'Faculty Glyphic', Georgia, serif; font-style:italic; font-size:clamp(17px,1.8vw,22px); line-height:1.4; margin:0 0 18px;}
+.pj-name{font-family:var(--font-display), Georgia, serif; font-style:italic; font-size:clamp(17px,1.8vw,22px); line-height:1.4; margin:0 0 18px;}
 .pj-headline{font-size:clamp(28px,3.4vw,44px); line-height:1.1; letter-spacing:-.01em; /* same size as the Next project title */ margin:0 0 60px; max-width:560px;}
 .pj-text p{font-size:18px; line-height:1.6; margin:0 0 14px; max-width:560px;}
 .pj-text .pj-extra{display:none;}
@@ -287,7 +273,7 @@ a.card{display:block; color:inherit;}
 .pj-next{display:block; margin:130px 15.2% 0;}
 .pj-next-inner{border-top:1px solid var(--line); padding-top:40px;}
 .pj-next .eyebrow{margin-bottom:24px;}
-.pj-next-title{display:flex; align-items:center; gap:.25em; font-family:'Faculty Glyphic', Georgia, serif; font-size:clamp(28px,3.4vw,44px); line-height:1.1; letter-spacing:-.01em;}
+.pj-next-title{display:flex; align-items:center; gap:.25em; font-family:var(--font-display), Georgia, serif; font-size:clamp(28px,3.4vw,44px); line-height:1.1; letter-spacing:-.01em;}
 /* Arrow appears only on hover, sliding in diagonally */
 .pj-next-title svg{width:.55em; height:.55em; flex:none; opacity:0; transform:translate(-.12em,.12em) rotate(-45deg); transition:opacity .2s ease, transform .5s cubic-bezier(.2,.7,.2,1);}
 .pj-next:hover .pj-next-title svg{opacity:1; transform:rotate(-45deg);}
@@ -296,8 +282,12 @@ a.card{display:block; color:inherit;}
 .pj-gallery{display:flex; flex-direction:column; gap:16px; margin:110px 15.2% 0; /* same side margins as the intro text and Next project */}
 .pj-row--split{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
 .pj-img{
+  position:relative; overflow:hidden;
   border-radius:16px; background-color:rgba(21,16,12,.06);
-  background-image:var(--pic, var(--hero, var(--img))); background-size:cover; background-position:center;
+}
+.pj-img-pic{
+  position:absolute; inset:0;
+  background-size:cover; background-position:center;
 }
 .pj-row--single .pj-img{aspect-ratio:16/10;}
 .pj-row--split .pj-img{aspect-ratio:4/5;}
@@ -305,18 +295,44 @@ a.card{display:block; color:inherit;}
   .pj-gallery{margin:70px 20px 0; gap:12px;}
   .pj-row--split{grid-template-columns:1fr; gap:12px;}
 }
-/* Nav sits transparent over the photo, then returns to normal once the panel reaches it */
-body.pj-over-hero nav{background:transparent;}
-body.pj-over-hero .logo-mark{color:var(--dark-ink);}
-body.pj-over-hero .burger span{background:var(--dark-ink);}
 @media (max-width:800px){
-  .pj-hero{height:62vh;}
-  .pj-panel{margin-top:-40px; padding:48px 0 100px; border-radius:28px 28px 32px 32px;}
+  .pj-panel{padding:48px 0 100px;}
   .pj-intro{grid-template-columns:20px 1fr 20px;}
   .pj-main, .pj-side, .pj-intro > .pj-headline{grid-column:2;}
   .pj-side{grid-row:3; margin-top:40px;}
   .pj-next{margin:100px 20px 0;}
   .pj-text p, .pj-more{font-size:17px;} /* Read more always matches the description size */
+}
+
+/* EVENTS (after Works; follows the light/dark flip like Works) */
+.events{background:var(--bg); color:var(--ink); padding:40px 0 110px; transition:background-color .5s ease, color .5s ease;}
+body.is-dark .events{background:var(--dark-bg); color:var(--dark-ink);}
+.events .eyebrow{color:var(--muted); transition:color .5s ease;}
+body.is-dark .events .eyebrow{color:var(--dark-muted);}
+.events h2{font-size:clamp(30px,4.6vw,52px); line-height:1.15; max-width:760px;}
+.events-story{margin-top:20px; max-width:620px;}
+.events-story p{margin:0; font-size:17px; line-height:1.65; color:var(--ink); transition:color .5s ease;}
+body.is-dark .events-story p{color:var(--dark-ink);}
+/* Endless strip: small fully rounded pills drift left; the hovered (or tapped) one pops up
+   into a large photo with small rounded corners while the strip pauses (main.js). */
+.moments-stage{
+  --h-small:150px; --h-big:min(58vh, 560px);
+  margin-top:56px; height:var(--h-big); display:flex; align-items:center; overflow:hidden;
+}
+.moments-stage.is-manual{overflow-x:auto; scrollbar-width:none; padding:0 max(40px, calc((100% - 1400px) / 2 + 40px));}
+.moments-stage::-webkit-scrollbar{display:none;}
+.moments-track{display:flex; align-items:center; gap:14px; padding-left:14px; will-change:transform;}
+.moment{
+  margin:0; flex:none; overflow:hidden; cursor:pointer;
+  height:var(--h-small); width:calc(var(--h-small) * 1.75); border-radius:999px;
+  background:rgba(21,16,12,.08);
+  transition:width .28s cubic-bezier(.2,.8,.2,1), height .28s cubic-bezier(.2,.8,.2,1), border-radius .28s cubic-bezier(.2,.8,.2,1);
+}
+.moment.is-active{height:var(--h-big); width:calc(var(--h-big) * var(--r, 1.333)); border-radius:32px; cursor:default;}
+.moment img{width:100%; height:100%; object-fit:cover; display:block; user-select:none; -webkit-user-drag:none;}
+@media (max-width:700px){
+  .moments-stage{--h-small:100px; --h-big:360px; margin-top:40px;}
+  .moment.is-active{border-radius:24px;}
 }
 
 /* ABOUT */
@@ -373,3 +389,4 @@ footer .wrap{width:100%; max-width:none; padding:0 34px;}
   .foot-copy{grid-column:1 / -1;}
 }
 .cards-error{color:var(--muted); font-size:15px; padding:40px 0;}
+
