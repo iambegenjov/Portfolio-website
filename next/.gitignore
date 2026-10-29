@@ -5,3 +5,5 @@ out/
 .node/
 preview/
 preview-files.json
+.vercel
+.env*

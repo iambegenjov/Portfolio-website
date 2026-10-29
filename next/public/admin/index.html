@@ -213,6 +213,11 @@
   .icon-btn[disabled]{opacity:.35; cursor:default;}
   .sr-only{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap;}
   :focus-visible{outline:2px solid var(--ink); outline-offset:2px;}
+  body.locked .tabs, body.locked [data-panel]{display:none !important;}
+  .login-row{display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap; margin-top:18px;}
+  .login-row .field{flex:1 1 260px; margin:0;}
+  .login-row .pill{height:48px;}
+  #logged-in{justify-content:space-between;}
 </style>
 </head>
 <body>
@@ -246,22 +251,21 @@
 </header>
 
 <div class="wrap">
-  <section class="connect" id="connect">
+  <section class="connect" id="login">
     <div class="connect-head">
-      <h2>GitHub connection</h2>
-      <span class="status" id="conn-status"><i></i><span>Not connected</span></span>
+      <h2 id="login-title">Log in</h2>
+      <span class="status" id="conn-status"><i></i><span>Logged out</span></span>
     </div>
-    <p class="help" style="margin-top:10px">Saved only in this browser. Create the access key at <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">GitHub › Settings › Fine-grained tokens</a>: choose only this repository, then Repository permissions › Contents: Read and write.</p>
-    <div class="connect-grid">
-      <div class="field"><label for="c-owner">GitHub username</label><input type="text" id="c-owner" placeholder="iambegenjov" autocomplete="off"></div>
-      <div class="field"><label for="c-repo">Repository</label><input type="text" id="c-repo" placeholder="Portfolio-website" autocomplete="off"></div>
-      <div class="field"><label for="c-branch">Branch</label><input type="text" id="c-branch" placeholder="main" autocomplete="off"></div>
-      <div class="field full"><label for="c-token">Access key (token)</label><input type="password" id="c-token" placeholder="github_pat_…" autocomplete="off"></div>
-    </div>
-    <div class="connect-actions">
-      <button type="button" class="pill dark small" id="connect-btn">Connect</button>
-      <button type="button" class="pill small" id="disconnect-btn" hidden>Disconnect</button>
+    <form id="login-form" class="login-form" autocomplete="on">
+      <p class="help" id="login-help" style="margin-top:10px">Enter the admin password to manage the site.</p>
+      <div class="login-row">
+        <div class="field"><label for="password">Password</label><input type="password" id="password" name="password" autocomplete="current-password" required></div>
+        <button type="submit" class="pill dark">Log in</button>
+      </div>
+    </form>
+    <div class="connect-actions" id="logged-in" hidden>
       <span class="readonly-note" id="conn-note"></span>
+      <button type="button" class="pill small" id="logout-btn">Log out</button>
     </div>
   </section>
 
@@ -419,19 +423,20 @@
 <div class="busy" id="busy" hidden><span id="busy-text">Publishing…</span></div>
 
 <script>
-/* Portfolio admin (Next.js site). Reads the site's data from the GitHub repository and publishes
-   every save as one commit; Vercel rebuilds the site from it. Without a connection it shows the
-   data of the site it is served from, read only.
+/* Portfolio admin (Next.js site). After logging in with the admin password it reads the site's data
+   from the GitHub repository and publishes every save as one commit; Vercel rebuilds the site from it.
+   GitHub calls go through /api/admin/github, where the server adds its token (lib/admin-auth.js).
    Data (paths inside SITE_DIR, which is next/public/ in the repository):
      projects/index.json {projects:[slug]}   projects/<slug>/project.json {title, category, year, tags, description, card, cover, gallery:[{type, images}]}
      events/index.json   {events:[slug]}     events/<slug>/event.json     {title, story, photos:[{file, ratio, alt}]}
      site.json           {email, resume, instagram, linkedin, ctaHeading, ctaButton}
    Image values in the editors are either an existing file name or {data:dataURL, ratio} for a new upload. */
 var SITE_DIR = 'next/public/';
-var CONN_KEY = 'portfolio-admin-github';
+var TAB_KEY = 'portfolio-admin-tab';
+var API = '../api/admin/';
 var ICON_UP = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"/></svg>';
-var conn = null;          // {owner, repo, branch, token}
-var connected = false;
+var branch = 'main';
+var connected = false;    // logged in and the repository was read
 var headSha = null;       // commit the data was loaded from (used for image URLs)
 
 function $(id){ return document.getElementById(id); }
@@ -455,11 +460,13 @@ function armed(btn){
 /* ---------------- GitHub API ---------------- */
 function gh(path, opts){
   opts = opts || {};
-  return fetch('https://api.github.com/repos/' + conn.owner + '/' + conn.repo + path, {
+  return fetch(API + 'github' + path, {
     method: opts.method || 'GET',
-    headers: {'Authorization': 'Bearer ' + conn.token, 'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'},
-    body: opts.body ? JSON.stringify(opts.body) : undefined
+    headers: opts.body ? {'Content-Type': 'application/json'} : undefined,
+    body: opts.body ? JSON.stringify(opts.body) : undefined,
+    credentials: 'same-origin'
   }).then(function(r){
+    if(r.status === 401) lock('Your login has expired. Please log in again.');
     if(r.status === 204) return null;
     return r.json().then(function(j){
       if(!r.ok){ var e = new Error(j.message || ('GitHub error ' + r.status)); e.status = r.status; throw e; }
@@ -479,13 +486,13 @@ function readJSON(path){
 function fileURL(dir, file){
   if(!file) return '';
   if(typeof file === 'object') return file.data;
-  if(connected) return 'https://raw.githubusercontent.com/' + conn.owner + '/' + conn.repo + '/' + headSha + '/' + SITE_DIR + dir + '/' + encodeURI(file);
+  if(connected) return API + 'raw?path=' + encodeURIComponent(dir + '/' + file) + '&ref=' + headSha;
   return '../' + dir + '/' + encodeURI(file);
 }
 // One commit with every file change: {path inside SITE_DIR: {text}|{base64}|null(delete)}
 function commit(changes, message){
   var ref;
-  return gh('/git/ref/heads/' + conn.branch).then(function(r){
+  return gh('/git/ref/heads/' + branch).then(function(r){
     ref = r.object.sha;
     return gh('/git/commits/' + ref);
   }).then(function(c){
@@ -500,7 +507,7 @@ function commit(changes, message){
   }).then(function(t){
     return gh('/git/commits', {method:'POST', body:{message:message, tree:t.sha, parents:[ref]}});
   }).then(function(nc){
-    return gh('/git/refs/heads/' + conn.branch, {method:'PATCH', body:{sha:nc.sha}}).then(function(){ headSha = nc.sha; return nc; });
+    return gh('/git/refs/heads/' + branch, {method:'PATCH', body:{sha:nc.sha}}).then(function(){ headSha = nc.sha; return nc; });
   });
 }
 function listFolder(dir){
@@ -515,44 +522,48 @@ function pruneFolder(dir, keep, changes){
   });
 }
 
-/* ---------------- connection ---------------- */
-function loadConn(){ try{ return JSON.parse(localStorage.getItem(CONN_KEY) || 'null'); }catch(e){ return null; } }
+/* ---------------- login ---------------- */
 function setStatus(kind, text){ $('conn-status').className = 'status ' + (kind || ''); $('conn-status').querySelector('span').textContent = text; }
-function connect(){
-  conn = {owner:$('c-owner').value.trim(), repo:($('c-repo').value.trim() || 'Portfolio-website'), branch:($('c-branch').value.trim() || 'main'), token:$('c-token').value.trim()};
-  if(!conn.owner || !conn.token){ toast('Add your GitHub username and access key.', true); return; }
-  busy('Connecting to GitHub…');
-  gh('').then(function(repo){
-    if(repo.permissions && !repo.permissions.push) throw new Error('This key can read but not write. Give it "Contents: Read and write".');
-    return gh('/git/ref/heads/' + conn.branch);
-  }).then(function(r){
+function lock(message){
+  connected = false; headSha = null;
+  document.body.classList.add('locked');
+  $('login-form').hidden = false; $('logged-in').hidden = true;
+  $('login-title').textContent = 'Log in';
+  setStatus('', 'Logged out');
+  if(message) $('login-help').textContent = message;
+  updateSaveState();
+}
+function unlock(){
+  busy('Loading your site…');
+  return gh('/git/ref/heads/' + branch).then(function(r){
     headSha = r.object.sha; connected = true;
-    try{ localStorage.setItem(CONN_KEY, JSON.stringify(conn)); }catch(e){}
-    setStatus('ok', 'Connected to ' + conn.owner + '/' + conn.repo);
-    $('disconnect-btn').hidden = false;
-    $('conn-note').textContent = '';
+    document.body.classList.remove('locked');
+    $('login-form').hidden = true; $('logged-in').hidden = false;
+    $('login-title').textContent = 'Admin';
+    setStatus('ok', 'Logged in');
+    $('conn-note').textContent = 'Connected to GitHub (' + branch + ').';
     return loadAll();
   }).catch(function(e){
-    connected = false;
-    setStatus('err', 'Not connected');
-    toast('Could not connect: ' + e.message, true);
-    return loadAll();
+    if(e.status !== 401){ toast('Could not reach GitHub: ' + e.message, true); lock('Logged in, but GitHub could not be reached. Check the GITHUB_TOKEN setting on Vercel.'); }
   }).then(function(){ busy(null); updateSaveState(); });
 }
-function disconnect(){
-  try{ localStorage.removeItem(CONN_KEY); }catch(e){}
-  connected = false; conn = null; $('c-token').value = '';
-  setStatus('', 'Not connected'); $('disconnect-btn').hidden = true;
-  updateSaveState(); loadAll();
-}
+$('login-form').addEventListener('submit', function(e){
+  e.preventDefault();
+  busy('Logging in…');
+  fetch(API + 'session', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({password:$('password').value}), credentials:'same-origin'})
+    .then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.error || 'Could not log in.'); return j; }); })
+    .then(function(j){ branch = j.branch || branch; $('password').value = ''; busy(null); return unlock(); })
+    .catch(function(err){ busy(null); toast(err.message, true); $('password').select(); });
+});
+$('logout-btn').onclick = function(){
+  fetch(API + 'session', {method:'DELETE', credentials:'same-origin'}).catch(function(){}).then(function(){ lock('You are logged out.'); });
+};
 function updateSaveState(){
   [].forEach.call(document.querySelectorAll('.save'), function(b){ b.disabled = !connected; });
-  [].forEach.call(document.querySelectorAll('.save-note'), function(n){ n.textContent = connected ? 'The live site updates about a minute after you publish.' : 'Connect GitHub above to publish.'; });
+  [].forEach.call(document.querySelectorAll('.save-note'), function(n){ n.textContent = connected ? 'The live site updates about a minute after you publish.' : 'Log in to publish.'; });
 }
 function loadAll(){
-  return Promise.all([Projects.load(), Events.load(), Contact.load()]).then(function(){
-    $('conn-note').textContent = connected ? '' : 'Showing the data of this site (read only).';
-  });
+  return Promise.all([Projects.load(), Events.load(), Contact.load()]);
 }
 
 /* ---------------- images ---------------- */
@@ -680,7 +691,7 @@ var Projects = (function(){
     $('p-form').scrollIntoView({behavior:'smooth', block:'start'});
   }
   function save(){
-    if(!connected){ toast('Connect GitHub first.', true); return; }
+    if(!connected){ toast('Log in first.', true); return; }
     var title = $('f-name').value.trim();
     if(!title){ toast('Add a title first.', true); $('f-name').focus(); return; }
     var isNew = !editing, slug = editing;
@@ -712,7 +723,7 @@ var Projects = (function(){
       .then(function(){ busy(null); });
   }
   function remove(slug){
-    if(!connected){ toast('Connect GitHub first.', true); return; }
+    if(!connected){ toast('Log in first.', true); return; }
     var p = items[slug] || {}, newOrder = order.filter(function(s){ return s !== slug; });
     busy('Removing ' + (p.title || slug) + '…');
     var changes = {'projects/index.json': json({projects:newOrder})};
@@ -726,7 +737,7 @@ var Projects = (function(){
       .then(function(){ busy(null); });
   }
   function move(slug, d){
-    if(!connected){ toast('Connect GitHub first.', true); return; }
+    if(!connected){ toast('Log in first.', true); return; }
     var i = order.indexOf(slug), j = i + d;
     if(j < 0 || j >= order.length) return;
     var newOrder = order.slice(); newOrder[i] = newOrder[j]; newOrder[j] = slug;
@@ -821,7 +832,7 @@ var Events = (function(){
     $('e-form').scrollIntoView({behavior:'smooth', block:'start'});
   }
   function save(){
-    if(!connected){ toast('Connect GitHub first.', true); return; }
+    if(!connected){ toast('Log in first.', true); return; }
     var title = $('e-title').value.trim();
     if(!title){ toast('Add a title first.', true); $('e-title').focus(); return; }
     if(!photos.length){ toast('Add at least one photo.', true); return; }
@@ -847,7 +858,7 @@ var Events = (function(){
       .then(function(){ busy(null); });
   }
   function remove(slug){
-    if(!connected){ toast('Connect GitHub first.', true); return; }
+    if(!connected){ toast('Log in first.', true); return; }
     var newOrder = order.filter(function(s){ return s !== slug; });
     var changes = {'events/index.json': json({events:newOrder})};
     busy('Removing event…');
@@ -861,7 +872,7 @@ var Events = (function(){
       .then(function(){ busy(null); });
   }
   function move(slug, d){
-    if(!connected){ toast('Connect GitHub first.', true); return; }
+    if(!connected){ toast('Log in first.', true); return; }
     var i = order.indexOf(slug), j = i + d;
     if(j < 0 || j >= order.length) return;
     var newOrder = order.slice(); newOrder[i] = newOrder[j]; newOrder[j] = slug;
@@ -887,7 +898,7 @@ var Contact = (function(){
     });
   }
   function save(){
-    if(!connected){ toast('Connect GitHub first.', true); return; }
+    if(!connected){ toast('Log in first.', true); return; }
     var data = Object.assign({}, current);
     Object.keys(FIELDS).forEach(function(k){ data[k] = $(FIELDS[k]).value.trim(); });
     if(data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)){ toast('That email address looks incomplete.', true); $('s-email').focus(); return; }
@@ -907,19 +918,24 @@ var Contact = (function(){
 function showTab(name){
   [].forEach.call(document.querySelectorAll('.tab'), function(t){ var on = t.dataset.tab === name; t.classList.toggle('on', on); t.setAttribute('aria-selected', on); });
   [].forEach.call(document.querySelectorAll('[data-panel]'), function(p){ p.hidden = p.dataset.panel !== name; });
-  try{ localStorage.setItem(CONN_KEY + '-tab', name); }catch(e){}
+  try{ localStorage.setItem(TAB_KEY, name); }catch(e){}
 }
 [].forEach.call(document.querySelectorAll('.tab'), function(t){ t.onclick = function(){ showTab(t.dataset.tab); }; });
-$('connect-btn').onclick = connect;
-$('disconnect-btn').onclick = disconnect;
 (function(){
   var tab = 'projects';
-  try{ tab = localStorage.getItem(CONN_KEY + '-tab') || tab; }catch(e){}
+  try{ tab = localStorage.getItem(TAB_KEY) || tab; }catch(e){}
   showTab(tab);
-  var saved = loadConn();
-  if(saved){ $('c-owner').value = saved.owner || ''; $('c-repo').value = saved.repo || ''; $('c-branch').value = saved.branch || ''; $('c-token').value = saved.token || ''; }
-  updateSaveState();
-  if(saved && saved.token) connect(); else loadAll();
+  lock();
+  try{ localStorage.removeItem('portfolio-admin-github'); }catch(e){}   // token saved by the older admin
+  function closed(text){ $('login-help').textContent = text; $('login-form').querySelector('.login-row').hidden = true; }
+  fetch(API + 'session', {credentials:'same-origin'})
+    .then(function(r){ if(!r.ok) throw new Error(); return r.json(); })
+    .then(function(j){
+      branch = j.branch || branch;
+      if(!j.configured) return closed('The admin is not set up yet: add ADMIN_PASSWORD and GITHUB_TOKEN in Vercel › Settings › Environment Variables, then redeploy.');
+      if(j.loggedIn) return unlock();
+    })
+    .catch(function(){ closed('The admin only works on the live site, where it can reach its server.'); });
 })();
 </script>
 </body>

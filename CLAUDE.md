@@ -12,7 +12,7 @@ Portfolio website for Muhammet Begenjov, built with Next.js (App Router) in `nex
 - `next/public/projects/<slug>/`: `project.json` + photos. Image paths in project.json are relative to that folder.
 - `docs/`: handoff notes, design references (`docs/reference/`), full-size source photos (`docs/source-photos/`, incl. the original AGI 2025 HEIC files), not used by the site.
 - `next/public/events/index.json` + `events/<slug>/event.json` (title, story, photos [{file, ratio, alt}]) feed the Events sections; `next/public/site.json` holds contact links and the yellow CTA text (`lib/site.js`).
-- `next/public/admin/index.html`: admin panel at `/admin` (Projects, Events, Contact tabs). Connects to GitHub (iambegenjov/Portfolio-website) with a fine-grained token stored only in the browser and publishes each save as one commit under `next/public/`; Vercel rebuilds. Without a connection it shows the site's data read only.
+- `next/public/admin/index.html`: admin panel at `/admin` (Projects, Events, Contact tabs), behind a password. It publishes each save as one commit under `next/public/` through `next/app/api/admin/*` (route files are named `route.api.js` so the static preview build skips them); the server holds the GitHub token (`lib/admin-auth.js`, Vercel env vars ADMIN_PASSWORD and GITHUB_TOKEN, optional GITHUB_REPO / GITHUB_BRANCH). Vercel rebuilds after each commit.
 - The old static site (index.html, assets/, projects/, old admin/, preview.command) was removed on 2026-10-29; it is in git history.
 
 ## Run it
@@ -24,7 +24,7 @@ npm run build
 npm run preview   # static copy for the claude.ai preview Artifact (next/preview/)
 ```
 Preview Artifact: https://claude.ai/artifact/XXzeDzYSs8sWkVzNgJT62c. `scripts/preview.mjs` renames `_next` to `nx` (the Artifact host reserves `_` names) and makes every path relative. Publish `next/preview/index.html` with the files listed in `next/preview-files.json`.
-Vercel: Root Directory `next`.
+Vercel: project portfolio-website, live at https://begenjov.vercel.app, deploys automatically from GitHub main (Root Directory `next`). Vercel CLI is in `next/.node` and logged in.
 
 ## Working rules
 - **Preview first:** the owner reviews every change on the claude.ai preview Artifact before it is treated as final.

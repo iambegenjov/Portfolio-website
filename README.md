@@ -9,7 +9,11 @@ docs/        Handoff notes, design reference screenshots, full-size source photo
 
 ## Admin panel
 
-Open `/admin` on the live site to add, edit, reorder or remove projects and events, and to change the contact links. The first time, connect it to GitHub with a fine-grained access token (github.com › Settings › Developer settings › Fine-grained tokens: only this repository, Repository permissions › Contents: Read and write). The token is stored only in that browser. Each save is a commit; Vercel updates the site about a minute later.
+Open `/admin` on the live site and log in with the admin password to add, edit, reorder or remove projects and events, and to change the contact links. Each save is a commit to GitHub; Vercel updates the site about a minute later.
+
+It needs two settings in Vercel › Project › Settings › Environment Variables (then redeploy):
+- `ADMIN_PASSWORD`: the password for `/admin`.
+- `GITHUB_TOKEN`: a fine-grained token (github.com › Settings › Developer settings › Fine-grained tokens) for this repository only, with Repository permissions › Contents: Read and write. It stays on the server and never reaches the browser.
 
 ## Add or change a project by hand
 
