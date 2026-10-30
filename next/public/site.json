@@ -6,18 +6,14 @@
       "url": ""
     },
     {
-      "label": "Résumé",
-      "url": ""
-    },
-    {
-      "label": "Instagram",
-      "url": ""
+      "label": "CV - Download",
+      "url": "/files/muhammet-begenjov-mvuwblyc.pdf"
     },
     {
       "label": "LinkedIn",
-      "url": ""
+      "url": "https://www.linkedin.com/in/muhammet-begenjow/"
     }
   ],
   "ctaHeading": "Let's move forward with your next project",
-  "ctaButton": "Hello"
+  "ctaButton": "Contact me"
 }
