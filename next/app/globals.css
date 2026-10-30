@@ -243,8 +243,6 @@ body.is-dark .page{background:var(--dark-bg);}
    intro text on the left, category pills on the right, then the image rows. */
 /* Behind the yellow panel's rounded bottom corners the dark footer colour must show, as on the home page */
 body.on-project{background:var(--dark-bg);}
-/* The dark body colour must not flash above the page when the browser's scroll bounces past the top */
-html:has(body.on-project){overscroll-behavior-y:none;}
 a.card{display:block; color:inherit;}
 .pj-panel{
   position:relative; z-index:1; padding:80px 0 130px;
