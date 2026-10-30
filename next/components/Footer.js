@@ -1,6 +1,5 @@
 'use client';
 
-import Link from './SiteLink';
 import Logo from './Logo';
 
 export function BackTop() {
@@ -36,12 +35,6 @@ export default function Footer({ site }) {
 
       <footer>
         <div className="wrap foot-grid">
-          <nav className="foot-col" aria-label="Menu">
-            <p className="foot-label">Menu</p>
-            <Link href="/#work">Works</Link>
-            <Link href="/#services">Services</Link>
-            <Link href="/#about">About</Link>
-          </nav>
           {site.links.length > 0 && (
             <div className="foot-col">
               <p className="foot-label">Connect</p>

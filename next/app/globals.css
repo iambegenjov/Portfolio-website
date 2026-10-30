@@ -383,7 +383,7 @@ footer{
   display:flex; flex-direction:column; overflow:hidden;
 }
 footer .wrap{width:100%; max-width:none; padding:0 34px;}
-/* Menu and Connect (links from admin › Contact), on a four-column grid from the left */
+/* Connect (links from admin › Contact), on a four-column grid from the left */
 .foot-grid{display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); column-gap:40px; align-items:start;}
 .foot-col{display:flex; flex-direction:column; align-items:flex-start; gap:12px;}
 .foot-label{margin:0 0 6px; font-size:14px; color:var(--dark-muted);}
