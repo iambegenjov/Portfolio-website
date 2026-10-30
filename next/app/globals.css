@@ -387,6 +387,7 @@ footer .wrap{width:100%; max-width:none; padding:0 34px;}
 .foot-col{display:flex; flex-direction:column; gap:14px;}
 .foot-col a{font-size:clamp(16px,1.3vw,20px); line-height:1.35; color:var(--dark-ink); transition:opacity .2s ease;}
 .foot-col a:hover{opacity:.6;}
+.foot-col span{font-size:clamp(16px,1.3vw,20px); line-height:1.35; color:var(--dark-ink);}
 .foot-copy{font-size:clamp(16px,1.3vw,20px); line-height:1.35; color:var(--dark-ink); font-weight:300;}
 .foot-wordmark{margin-top:auto; padding-top:80px; width:100%; overflow:hidden;}
 .foot-wordmark svg{width:100%; height:auto; display:block; color:var(--dark-ink);}

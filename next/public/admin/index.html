@@ -218,6 +218,13 @@
   .login-row .field{flex:1 1 260px; margin:0;}
   .login-row .pill{height:48px;}
   #logged-in{justify-content:space-between;}
+  .links{display:flex; flex-direction:column; gap:10px;}
+  .link-row{display:grid; grid-template-columns:minmax(0,.8fr) minmax(0,1.4fr) auto; gap:10px; align-items:end; border:1px solid var(--line); border-radius:16px; background:#fff; padding:12px 14px;}
+  .link-row .field{margin:0;}
+  .link-row .field label{font-size:12px; margin-bottom:6px;}
+  .link-row input{padding:10px 12px; font-size:14px;}
+  .link-row .row-actions{padding-bottom:5px;}
+  @media (max-width:640px){ .link-row{grid-template-columns:1fr;} }
 </style>
 </head>
 <body>
@@ -393,21 +400,20 @@
     <div class="step">
       <div class="step-no">01</div>
       <div>
-        <h3>Links</h3>
-        <p class="help">Used in the footer and by the yellow "Drop me a line" button. Leave a field empty and its link stays inactive.</p>
-        <div class="field"><label for="s-email">Email</label><input type="email" id="s-email" placeholder="hello@example.com" autocomplete="off"></div>
-        <div class="field"><label for="s-resume">Résumé link</label><input type="url" id="s-resume" placeholder="https://…" autocomplete="off"></div>
-        <div class="field"><label for="s-instagram">Instagram</label><input type="url" id="s-instagram" placeholder="https://instagram.com/…" autocomplete="off"></div>
-        <div class="field"><label for="s-linkedin">LinkedIn</label><input type="url" id="s-linkedin" placeholder="https://linkedin.com/in/…" autocomplete="off"></div>
+        <h3>Footer links</h3>
+        <p class="help">Shown in the footer, in this order, split over two columns. A link can be a web address, an email address or a phone number (tel:+993…). Leave the address empty and the name shows without a link.</p>
+        <div class="links" id="s-links"></div>
+        <div class="add-row"><button type="button" class="pill small" id="s-add-link">Add link</button></div>
       </div>
     </div>
     <div class="step">
       <div class="step-no">02</div>
       <div>
         <h3>Yellow panel</h3>
-        <p class="help">The large call to action above the footer.</p>
+        <p class="help">The large call to action above the footer. Its button opens an email to this address.</p>
         <div class="field"><label for="s-cta-heading">Heading</label><input type="text" id="s-cta-heading" autocomplete="off"></div>
         <div class="field"><label for="s-cta-button">Button</label><input type="text" id="s-cta-button" autocomplete="off"></div>
+        <div class="field"><label for="s-email">Button email</label><input type="email" id="s-email" placeholder="hello@example.com" autocomplete="off"></div>
       </div>
     </div>
     <div class="form-actions">
@@ -889,24 +895,54 @@ var Events = (function(){
 
 /* ======================= CONTACT ======================= */
 var Contact = (function(){
-  var FIELDS = {email:'s-email', resume:'s-resume', instagram:'s-instagram', linkedin:'s-linkedin', ctaHeading:'s-cta-heading', ctaButton:'s-cta-button'};
-  var current = {};
+  var current = {}, links = [];
+  // Older site.json files had fixed fields; turn them into the list
+  function fromOld(s){
+    return [['Contact', s.email ? s.email : ''], ['Résumé', s.resume], ['Instagram', s.instagram], ['LinkedIn', s.linkedin]]
+      .map(function(l){ return {label:l[0], url:l[1] || ''}; });
+  }
   function load(){
     return readJSON('site.json').catch(function(){ return {}; }).then(function(s){
       current = s || {};
-      Object.keys(FIELDS).forEach(function(k){ $(FIELDS[k]).value = current[k] || ''; });
+      links = Array.isArray(current.links) ? JSON.parse(JSON.stringify(current.links)) : fromOld(current);
+      $('s-email').value = current.email || '';
+      $('s-cta-heading').value = current.ctaHeading || '';
+      $('s-cta-button').value = current.ctaButton || '';
+      render();
     });
   }
+  function render(){
+    var box = $('s-links');
+    if(!links.length){ box.innerHTML = '<div class="rows-empty">No footer links. Add one below.</div>'; return; }
+    box.innerHTML = links.map(function(l, i){
+      return '<div class="link-row">' +
+        '<div class="field"><label for="l-label-' + i + '">Name</label><input type="text" id="l-label-' + i + '" data-k="label" data-i="' + i + '" value="' + esc(l.label) + '" placeholder="e.g. Instagram" autocomplete="off"></div>' +
+        '<div class="field"><label for="l-url-' + i + '">Address</label><input type="text" id="l-url-' + i + '" data-k="url" data-i="' + i + '" value="' + esc(l.url) + '" placeholder="https://… or name@example.com" autocomplete="off"></div>' +
+        '<div class="row-actions"><button type="button" class="icon-btn" data-lmove="' + i + ',-1" title="Move up"' + (i === 0 ? ' disabled' : '') + '>↑</button>' +
+        '<button type="button" class="icon-btn" data-lmove="' + i + ',1" title="Move down"' + (i === links.length - 1 ? ' disabled' : '') + '>↓</button>' +
+        '<button type="button" class="icon-btn" data-lremove="' + i + '" title="Remove link">✕</button></div></div>';
+    }).join('');
+  }
+  $('s-links').addEventListener('input', function(e){ var d = e.target.dataset; if(d.k) links[+d.i][d.k] = e.target.value; });
+  $('s-links').addEventListener('click', function(e){
+    var b;
+    if((b = e.target.closest('[data-lmove]'))){ var a = b.dataset.lmove.split(','), i = +a[0], j = i + +a[1], t = links[i]; links[i] = links[j]; links[j] = t; render(); }
+    else if((b = e.target.closest('[data-lremove]'))){ links.splice(+b.dataset.lremove, 1); render(); }
+  });
+  $('s-add-link').onclick = function(){ links.push({label:'', url:''}); render(); $('l-label-' + (links.length - 1)).focus(); };
+
   function save(){
     if(!connected){ toast('Log in first.', true); return; }
-    var data = Object.assign({}, current);
-    Object.keys(FIELDS).forEach(function(k){ data[k] = $(FIELDS[k]).value.trim(); });
-    if(data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)){ toast('That email address looks incomplete.', true); $('s-email').focus(); return; }
-    var bad = ['resume', 'instagram', 'linkedin'].filter(function(k){ return data[k] && !/^https?:\/\//.test(data[k]); });
-    if(bad.length){ toast('Links must start with https://', true); $(FIELDS[bad[0]]).focus(); return; }
+    var clean = links.map(function(l){ return {label:(l.label || '').trim(), url:(l.url || '').trim()}; })
+                     .filter(function(l){ return l.label || l.url; });
+    var unnamed = clean.findIndex(function(l){ return !l.label; });
+    if(unnamed >= 0){ toast('Give every link a name.', true); return; }
+    var email = $('s-email').value.trim();
+    if(email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ toast('That email address looks incomplete.', true); $('s-email').focus(); return; }
+    var data = {email:email, links:clean, ctaHeading:$('s-cta-heading').value.trim(), ctaButton:$('s-cta-button').value.trim()};
     busy('Publishing contact details…');
     commit({'site.json': json(data)}, 'Update contact details')
-      .then(function(){ current = data; toast('Contact details published. Live in about a minute.'); })
+      .then(function(){ current = data; links = JSON.parse(JSON.stringify(clean)); render(); toast('Contact details published. Live in about a minute.'); })
       .catch(function(e){ toast('Could not publish: ' + e.message, true); })
       .then(function(){ busy(null); });
   }

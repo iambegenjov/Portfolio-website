@@ -13,8 +13,19 @@ export function BackTop() {
 
 // CTA panel (sticks under the page; must stay a direct child of body for that) and the dark footer beneath it, revealed as the page scrolls up
 export default function Footer({ site }) {
-  const out = (url) => (url ? { href: url, target: '_blank', rel: 'noopener noreferrer' } : { href: '#' });
   const mail = site.email ? { href: `mailto:${site.email}` } : { href: '#' };
+  // The editable links fill the two middle columns, first half then second half
+  const half = Math.ceil(site.links.length / 2);
+  const columns = [site.links.slice(0, half), site.links.slice(half)];
+  const link = (l, i) =>
+    l.href ? (
+      <a key={i} href={l.href} {...(l.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
+        {l.label}
+      </a>
+    ) : (
+      <span key={i}>{l.label}</span>
+    );
+
   return (
     <>
       <section className="cta-panel">
@@ -31,14 +42,11 @@ export default function Footer({ site }) {
             <Link href="/#services">Services</Link>
             <Link href="/#about">About</Link>
           </div>
-          <div className="foot-col">
-            <a {...mail}>Contact</a>
-            <a {...out(site.resume)}>Résumé</a>
-          </div>
-          <div className="foot-col">
-            <a {...out(site.instagram)}>Instagram</a>
-            <a {...out(site.linkedin)}>LinkedIn</a>
-          </div>
+          {columns.map((col, c) => (
+            <div className="foot-col" key={c}>
+              {col.map(link)}
+            </div>
+          ))}
           <div className="foot-copy">© Copyright Muhammet Begenjov 2026</div>
         </div>
         <div className="wrap foot-wordmark">

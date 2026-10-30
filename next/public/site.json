@@ -1,8 +1,23 @@
 {
   "email": "",
-  "resume": "",
-  "instagram": "",
-  "linkedin": "",
+  "links": [
+    {
+      "label": "Contact",
+      "url": ""
+    },
+    {
+      "label": "Résumé",
+      "url": ""
+    },
+    {
+      "label": "Instagram",
+      "url": ""
+    },
+    {
+      "label": "LinkedIn",
+      "url": ""
+    }
+  ],
   "ctaHeading": "Let's move forward with your next project",
   "ctaButton": "Hello"
 }
