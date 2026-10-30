@@ -14,13 +14,12 @@ export function BackTop() {
 // CTA panel (sticks under the page; must stay a direct child of body for that) and the dark footer beneath it, revealed as the page scrolls up
 export default function Footer({ site }) {
   const mail = site.email ? { href: `mailto:${site.email}` } : { href: '#' };
-  // The editable links fill the two middle columns, first half then second half
-  const half = Math.ceil(site.links.length / 2);
-  const columns = [site.links.slice(0, half), site.links.slice(half)];
+  // The editable links (admin › Contact), in their saved order
   const link = (l, i) =>
     l.href ? (
       <a key={i} href={l.href} {...(l.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
         {l.label}
+        {l.external && <span className="foot-ext" aria-hidden="true">↗</span>}
       </a>
     ) : (
       <span key={i}>{l.label}</span>
@@ -37,17 +36,24 @@ export default function Footer({ site }) {
 
       <footer>
         <div className="wrap foot-grid">
-          <div className="foot-col">
+          <nav className="foot-col" aria-label="Menu">
+            <p className="foot-label">Menu</p>
             <Link href="/#work">Works</Link>
             <Link href="/#services">Services</Link>
             <Link href="/#about">About</Link>
-          </div>
-          {columns.map((col, c) => (
-            <div className="foot-col" key={c}>
-              {col.map(link)}
+          </nav>
+          {site.links.length > 0 && (
+            <div className="foot-col">
+              <p className="foot-label">Connect</p>
+              {site.links.map(link)}
             </div>
-          ))}
-          <div className="foot-copy">© Copyright Muhammet Begenjov 2026</div>
+          )}
+        </div>
+        <div className="wrap foot-bottom">
+          <p>© Muhammet Begenjov 2026</p>
+          <button type="button" className="foot-top" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+            Back to top ↑
+          </button>
         </div>
         <div className="wrap foot-wordmark">
           <Logo />

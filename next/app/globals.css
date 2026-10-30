@@ -383,18 +383,27 @@ footer{
   display:flex; flex-direction:column; overflow:hidden;
 }
 footer .wrap{width:100%; max-width:none; padding:0 34px;}
-.foot-grid{display:grid; grid-template-columns:17% 17% 21% 1fr; align-items:start;}
-.foot-col{display:flex; flex-direction:column; gap:14px;}
-.foot-col a{font-size:clamp(16px,1.3vw,20px); line-height:1.35; color:var(--dark-ink); transition:opacity .2s ease;}
+/* Menu and Connect (links from admin › Contact), on a four-column grid from the left */
+.foot-grid{display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); column-gap:40px; align-items:start;}
+.foot-col{display:flex; flex-direction:column; align-items:flex-start; gap:12px;}
+.foot-label{margin:0 0 6px; font-size:14px; color:var(--dark-muted);}
+.foot-col a, .foot-col > span{font-size:clamp(16px,1.3vw,20px); line-height:1.35; color:var(--dark-ink);}
+.foot-col a{display:inline-flex; align-items:baseline; gap:.3em; transition:opacity .2s ease;}
 .foot-col a:hover{opacity:.6;}
-.foot-col span{font-size:clamp(16px,1.3vw,20px); line-height:1.35; color:var(--dark-ink);}
-.foot-copy{font-size:clamp(16px,1.3vw,20px); line-height:1.35; color:var(--dark-ink); font-weight:300;}
-.foot-wordmark{margin-top:auto; padding-top:80px; width:100%; overflow:hidden;}
+.foot-ext{font-size:.75em; color:var(--dark-muted);}
+/* Bottom line: copyright and back to top, above the wordmark */
+.foot-bottom{display:flex; justify-content:space-between; align-items:center; gap:20px; margin-top:96px;}
+footer .foot-bottom{padding-top:20px; background:linear-gradient(rgba(244,239,230,.14), rgba(244,239,230,.14)) 34px 0 / calc(100% - 68px) 1px no-repeat;} /* hairline inside the side padding */
+.foot-bottom p{margin:0; font-size:14px; color:var(--dark-muted);}
+.foot-top{padding:0; border:0; background:none; cursor:pointer; font:inherit; font-size:14px; color:var(--dark-muted); transition:color .2s ease;}
+.foot-top:hover{color:var(--dark-ink);}
+.foot-wordmark{margin-top:auto; padding-top:40px; width:100%; overflow:hidden;}
 .foot-wordmark svg{width:100%; height:auto; display:block; color:var(--dark-ink);}
 @media (max-width:700px){
   footer .wrap{padding:0 20px;}
-  .foot-grid{grid-template-columns:1fr 1fr; row-gap:32px;}
-  .foot-copy{grid-column:1 / -1;}
+  .foot-grid{grid-template-columns:1fr 1fr; row-gap:40px; column-gap:20px;}
+  .foot-bottom{margin-top:64px;}
+  footer .foot-bottom{background-position:20px 0; background-size:calc(100% - 40px) 1px;}
 }
 .cards-error{color:var(--muted); font-size:15px; padding:40px 0;}
 
