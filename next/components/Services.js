@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 const SERVICES = [
   ['Brand Identity', 'Name, mark, voice — built to be recognized.'],
@@ -13,6 +13,11 @@ export default function Services() {
   const rowsRef = useRef(null);
   const pillRef = useRef(null);
   const active = useRef(false);
+
+  // Until this script runs, CSS gives each row its own pill (see .rows:not(.is-ready) in globals.css)
+  useEffect(() => {
+    rowsRef.current.classList.add('is-ready');
+  }, []);
 
   // One shared dark pill slides from the previously hovered row to the current one
   const enter = (e) => {

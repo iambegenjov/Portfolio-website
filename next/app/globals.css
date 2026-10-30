@@ -127,6 +127,13 @@ body.is-dark .studies .eyebrow{color:var(--dark-muted);}
 }
 .row-pill.no-move{ transition:opacity .4s ease, transform .4s ease; }
 .rows.is-hovering .row-pill{ opacity:1; transform:scale(1); }
+/* Before the page's script has loaded, the hovered row shows its own pill, so hover works from the first moment */
+.rows:not(.is-ready) .row:hover::before{
+  content:""; position:absolute; left:0; right:0; top:-1px; bottom:-1px; z-index:0;
+  background:var(--ink); border-radius:20px;
+  box-shadow:0 30px 60px -20px rgba(21,16,12,.22);
+  pointer-events:none;
+}
 .row-title{position:relative; z-index:1; display:flex; align-items:center;}
 .row h3{font-size:26px; font-weight:400; transition:color .3s ease, transform .3s ease;}
 .row:hover h3{ transform:translateX(26px); }
