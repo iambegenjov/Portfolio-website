@@ -223,7 +223,8 @@
   .link-row .field{margin:0;}
   .link-row .field label{font-size:12px; margin-bottom:6px;}
   .link-row input{padding:10px 12px; font-size:14px;}
-  .link-row .row-actions{padding-bottom:5px;}
+  .link-row .row-actions{padding-bottom:5px; display:flex; gap:6px; align-items:center;}
+  .link-row .link-file{grid-column:1 / -1; margin:0;}
   @media (max-width:640px){ .link-row{grid-template-columns:1fr;} }
 </style>
 </head>
@@ -401,7 +402,7 @@
       <div class="step-no">01</div>
       <div>
         <h3>Footer links</h3>
-        <p class="help">Shown in the footer, in this order, split over two columns. A link can be a web address, an email address or a phone number (tel:+993…). Leave the address empty and the name shows without a link.</p>
+        <p class="help">Shown in the footer, in this order, split over two columns. A link can be a web address, an email address or a phone number, or a file you upload (for example your résumé as a PDF). Leave the address empty and the name shows without a link.</p>
         <div class="links" id="s-links"></div>
         <div class="add-row"><button type="button" class="pill small" id="s-add-link">Add link</button></div>
       </div>
@@ -425,6 +426,7 @@
 
 <input type="file" id="file" accept="image/*" hidden>
 <input type="file" id="files" accept="image/*" multiple hidden>
+<input type="file" id="doc" accept=".pdf,application/pdf" hidden>
 <div class="toast" id="toast" role="status"></div>
 <div class="busy" id="busy" hidden><span id="busy-text">Publishing…</span></div>
 
@@ -918,9 +920,12 @@ var Contact = (function(){
       return '<div class="link-row">' +
         '<div class="field"><label for="l-label-' + i + '">Name</label><input type="text" id="l-label-' + i + '" data-k="label" data-i="' + i + '" value="' + esc(l.label) + '" placeholder="e.g. Instagram" autocomplete="off"></div>' +
         '<div class="field"><label for="l-url-' + i + '">Address</label><input type="text" id="l-url-' + i + '" data-k="url" data-i="' + i + '" value="' + esc(l.url) + '" placeholder="https://… or name@example.com" autocomplete="off"></div>' +
-        '<div class="row-actions"><button type="button" class="icon-btn" data-lmove="' + i + ',-1" title="Move up"' + (i === 0 ? ' disabled' : '') + '>↑</button>' +
+        '<div class="row-actions"><button type="button" class="pill small" data-lupload="' + i + '" title="Upload a PDF for this link">' + (l.upload ? 'Change file' : 'Upload file') + '</button>' +
+        '<button type="button" class="icon-btn" data-lmove="' + i + ',-1" title="Move up"' + (i === 0 ? ' disabled' : '') + '>↑</button>' +
         '<button type="button" class="icon-btn" data-lmove="' + i + ',1" title="Move down"' + (i === links.length - 1 ? ' disabled' : '') + '>↓</button>' +
-        '<button type="button" class="icon-btn" data-lremove="' + i + '" title="Remove link">✕</button></div></div>';
+        '<button type="button" class="icon-btn" data-lremove="' + i + '" title="Remove link">✕</button></div>' +
+        (l.upload ? '<p class="hint link-file">' + esc(l.upload.name) + ' is uploaded when you publish.</p>' : (/^\/files\//.test(l.url || '') ? '<p class="hint link-file">Opens the uploaded file ' + esc(l.url.replace(/^\/files\//, '')) + '.</p>' : '')) +
+        '</div>';
     }).join('');
   }
   $('s-links').addEventListener('input', function(e){ var d = e.target.dataset; if(d.k) links[+d.i][d.k] = e.target.value; });
@@ -928,11 +933,33 @@ var Contact = (function(){
     var b;
     if((b = e.target.closest('[data-lmove]'))){ var a = b.dataset.lmove.split(','), i = +a[0], j = i + +a[1], t = links[i]; links[i] = links[j]; links[j] = t; render(); }
     else if((b = e.target.closest('[data-lremove]'))){ links.splice(+b.dataset.lremove, 1); render(); }
+    else if((b = e.target.closest('[data-lupload]'))){ uploadFor = +b.dataset.lupload; $('doc').click(); }
+  });
+  // A file for a link (a PDF résumé): stored in files/ on publish, the link points to it
+  var uploadFor = null;
+  $('doc').addEventListener('change', function(e){
+    var f = e.target.files[0], i = uploadFor; e.target.value = ''; uploadFor = null;
+    if(!f || i == null) return;
+    // Uploads pass through the site's server, which takes requests up to about 4.5 MB
+    if(f.size > 3 * 1024 * 1024){ toast('That file is over 3 MB. Please export a smaller PDF (for example with "Reduce file size").', true); return; }
+    var reader = new FileReader();
+    reader.onload = function(){
+      var ext = (f.name.match(/\.[a-z0-9]+$/i) || ['.pdf'])[0].toLowerCase();
+      var name = slugify(f.name.replace(/\.[a-z0-9]+$/i, '')) + '-' + Date.now().toString(36) + ext;
+      links[i].upload = {name:f.name, file:name, base64:String(reader.result).split(',')[1]};
+      links[i].url = '/files/' + name;
+      if(!links[i].label) links[i].label = 'Résumé';
+      render();
+    };
+    reader.onerror = function(){ toast('That file could not be read.', true); };
+    reader.readAsDataURL(f);
   });
   $('s-add-link').onclick = function(){ links.push({label:'', url:''}); render(); $('l-label-' + (links.length - 1)).focus(); };
 
   function save(){
     if(!connected){ toast('Log in first.', true); return; }
+    var changes = {};
+    links.forEach(function(l){ if(l.upload && l.url === '/files/' + l.upload.file) changes['files/' + l.upload.file] = {base64:l.upload.base64}; });
     var clean = links.map(function(l){ return {label:(l.label || '').trim(), url:(l.url || '').trim()}; })
                      .filter(function(l){ return l.label || l.url; });
     var unnamed = clean.findIndex(function(l){ return !l.label; });
@@ -940,8 +967,11 @@ var Contact = (function(){
     var email = $('s-email').value.trim();
     if(email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ toast('That email address looks incomplete.', true); $('s-email').focus(); return; }
     var data = {email:email, links:clean, ctaHeading:$('s-cta-heading').value.trim(), ctaButton:$('s-cta-button').value.trim()};
+    changes['site.json'] = json(data);
+    // Files no link uses any more are removed in the same commit
+    var keep = clean.map(function(l){ return l.url.replace(/^\/files\//, ''); });
     busy('Publishing contact details…');
-    commit({'site.json': json(data)}, 'Update contact details')
+    pruneFolder('files', keep, changes).then(function(){ return commit(changes, 'Update contact details'); })
       .then(function(){ current = data; links = JSON.parse(JSON.stringify(clean)); render(); toast('Contact details published. Live in about a minute.'); })
       .catch(function(e){ toast('Could not publish: ' + e.message, true); })
       .then(function(){ busy(null); });

@@ -8,7 +8,7 @@ const DEFAULT_LINKS = ['Contact', 'Résumé', 'Instagram', 'LinkedIn'].map((labe
 function toHref(url) {
   const u = String(url || '').trim();
   if (!u) return null;
-  if (/^(https?:|mailto:|tel:)/i.test(u)) return u;
+  if (/^(https?:|mailto:|tel:)/i.test(u) || u.startsWith('/')) return u; // '/files/…' is a file uploaded in the admin
   if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(u)) return `mailto:${u}`;
   if (/^\+?[\d\s()-]{6,}$/.test(u)) return `tel:${u.replace(/[^\d+]/g, '')}`;
   return `https://${u}`;
@@ -35,7 +35,7 @@ export function getSite() {
     .filter((l) => l && text(l.label, ''))
     .map((l) => {
       const href = toHref(l.url);
-      return { label: l.label.trim(), href, external: !!href && /^https?:/i.test(href) };
+      return { label: l.label.trim(), href, external: !!href && /^(https?:|\/files\/)/i.test(href) };
     });
   return {
     email: text(data.email, ''),
