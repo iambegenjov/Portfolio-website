@@ -1,19 +1,15 @@
 {
-  "email": "",
+  "email": "begenjow06@gmail.com",
   "links": [
-    {
-      "label": "Contact",
-      "url": ""
-    },
     {
       "label": "CV - Download",
       "url": "/files/muhammet-begenjov-mvuwblyc.pdf"
     },
     {
-      "label": "LinkedIn",
-      "url": "https://www.linkedin.com/in/muhammet-begenjow/"
+      "label": "Muhmmet Begenjov",
+      "url": "Parahat street 9/37"
     }
   ],
   "ctaHeading": "Let's move forward with your next project",
-  "ctaButton": "Contact me"
+  "ctaButton": "Say hi to me"
 }
