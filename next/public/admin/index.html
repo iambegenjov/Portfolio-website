@@ -344,8 +344,8 @@
   <aside class="side">
     <section>
       <div class="list-head"><h2>Your projects</h2><span class="count" id="p-count"></span></div>
-      <p class="help">Click a project to edit it. Use the arrows to change the order in Works, then press Save order.</p>
-      <div class="order-bar" id="p-orderbar" hidden><span>Order changed, not saved yet.</span><button type="button" class="pill small" data-undo>Undo</button><button type="button" class="pill dark small" data-save-order>Save order</button></div>
+      <p class="help">Click a project to edit it. Use the arrows to change the order in Works, then press Publish order.</p>
+      <div class="order-bar" id="p-orderbar" hidden><span>Order changed, not published yet.</span><button type="button" class="pill small" data-undo>Undo</button><button type="button" class="pill dark small" data-save-order>Publish order</button></div>
       <div class="list" id="p-list"></div>
     </section>
   </aside>
@@ -388,8 +388,8 @@
   <aside class="side">
     <section>
       <div class="list-head"><h2>Your events</h2><span class="count" id="e-count"></span></div>
-      <p class="help">Click an event to edit it. Use the arrows to change the order on the home page, then press Save order.</p>
-      <div class="order-bar" id="e-orderbar" hidden><span>Order changed, not saved yet.</span><button type="button" class="pill small" data-undo>Undo</button><button type="button" class="pill dark small" data-save-order>Save order</button></div>
+      <p class="help">Click an event to edit it. Use the arrows to change the order on the home page, then press Publish order.</p>
+      <div class="order-bar" id="e-orderbar" hidden><span>Order changed, not published yet.</span><button type="button" class="pill small" data-undo>Undo</button><button type="button" class="pill dark small" data-save-order>Publish order</button></div>
       <div class="list" id="e-list"></div>
     </section>
   </aside>
@@ -750,7 +750,7 @@ var Projects = (function(){
     }).catch(function(err){ toast('Could not remove: ' + err.message, true); })
       .then(function(){ busy(null); });
   }
-  // Arrows only rearrange the list here; Save order publishes all the moves in one commit
+  // Arrows only rearrange the list here; Publish order publishes all the moves in one commit
   function move(slug, d){
     var i = order.indexOf(slug), j = i + d;
     if(j < 0 || j >= order.length) return;
@@ -760,9 +760,9 @@ var Projects = (function(){
   function saveOrder(){
     if(!connected){ toast('Log in first.', true); return; }
     var newOrder = order.slice();
-    busy('Saving order…');
+    busy('Publishing order…');
     commit({'projects/index.json': json({projects:newOrder})}, 'Reorder projects')
-      .then(function(){ saved = newOrder; renderList(); toast('Order saved. Live in about a minute.'); })
+      .then(function(){ saved = newOrder; renderList(); toast('Order published. Live in about a minute.'); })
       .catch(function(err){ toast('Could not save the order: ' + err.message, true); })
       .then(function(){ busy(null); });
   }
@@ -893,7 +893,7 @@ var Events = (function(){
     }).catch(function(err){ toast('Could not remove: ' + err.message, true); })
       .then(function(){ busy(null); });
   }
-  // Arrows only rearrange the list here; Save order publishes all the moves in one commit
+  // Arrows only rearrange the list here; Publish order publishes all the moves in one commit
   function move(slug, d){
     var i = order.indexOf(slug), j = i + d;
     if(j < 0 || j >= order.length) return;
@@ -903,9 +903,9 @@ var Events = (function(){
   function saveOrder(){
     if(!connected){ toast('Log in first.', true); return; }
     var newOrder = order.slice();
-    busy('Saving order…');
+    busy('Publishing order…');
     commit({'events/index.json': json({events:newOrder})}, 'Reorder events')
-      .then(function(){ saved = newOrder; renderList(); toast('Order saved. Live in about a minute.'); })
+      .then(function(){ saved = newOrder; renderList(); toast('Order published. Live in about a minute.'); })
       .catch(function(err){ toast('Could not save the order: ' + err.message, true); })
       .then(function(){ busy(null); });
   }
