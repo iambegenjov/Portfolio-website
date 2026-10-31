@@ -99,6 +99,7 @@
   .drop.portrait{aspect-ratio:2/3;}
   .drop.landscape{aspect-ratio:16/10;}
   .drop.half{aspect-ratio:4/5;}
+  .drop.logo-drop{max-width:260px; aspect-ratio:3/1; background-size:contain; background-repeat:no-repeat; background-origin:content-box; padding:18px;}
   .drop.has-img{border-style:solid; border-color:transparent; color:transparent;}
   .drop.has-img > *{visibility:hidden;}
   .drop .x{
@@ -366,6 +367,7 @@
         <p class="help">Each event gets its own section on the home page, after Works, with a moving strip of photos.</p>
         <div class="field"><label for="e-title">Title <span class="req">(required)</span></label><textarea id="e-title" class="short" placeholder="e.g. AGI Open 2025,&#10;Ho Chi Minh City"></textarea><p class="hint">Press Enter for a line break in the heading.</p></div>
         <div class="field"><label for="e-story">Story</label><textarea id="e-story" placeholder="A few sentences about the event."></textarea></div>
+        <div class="field"><label>Logo <span class="req">(optional)</span></label><div class="drop logo-drop" id="e-logo"></div><p class="hint">Shown above the title. An SVG takes the page's text colour; a PNG keeps its own colours (use a transparent background). Up to 1 MB.</p></div>
       </div>
     </div>
 
@@ -601,7 +603,7 @@ function compressImage(file, maxSide, done){
 }
 var pickTarget = null;
 $('file').addEventListener('change', function(e){ var f = e.target.files[0]; e.target.value = ''; if(f && pickTarget) pickTarget(f); pickTarget = null; });
-function pickOne(cb){ pickTarget = cb; $('file').click(); }
+function pickOne(cb, accept){ pickTarget = cb; $('file').accept = accept || 'image/*'; $('file').click(); }
 // Upload helper: new files get unique names so browsers never show a cached old photo
 function placer(dir, changes){
   var stamp = Date.now().toString(36), k = 0;
@@ -775,7 +777,7 @@ var Projects = (function(){
 
 /* ======================= EVENTS ======================= */
 var Events = (function(){
-  var order = [], saved = [], items = {}, editing = null, photos = [];
+  var order = [], saved = [], items = {}, editing = null, photos = [], logo = null;
   function dir(slug){ return 'events/' + slug; }
 
   function load(){
@@ -786,6 +788,31 @@ var Events = (function(){
       }));
     }).catch(function(){ order = []; items = {}; }).then(function(){ saved = order.slice(); reset(); });
   }
+
+  // Logo: kept as uploaded (SVG or transparent PNG), never converted to JPEG
+  function renderLogo(){
+    var el = $('e-logo'), url = logo ? fileURL(dir(editing), logo.file) : '';
+    el.innerHTML = ICON_UP + '<strong>Add logo</strong><span>SVG or PNG</span><button type="button" class="x" title="Remove logo" aria-label="Remove logo">✕</button>';
+    el.classList.toggle('has-img', !!url);
+    el.style.backgroundImage = url ? "url('" + url + "')" : '';
+  }
+  function takeLogo(f){
+    var ext = {'image/svg+xml':'svg', 'image/png':'png', 'image/webp':'webp'}[f.type];
+    if(!ext){ toast('Use an SVG or a PNG for the logo.', true); return; }
+    if(f.size > 1024 * 1024){ toast('The logo is over 1 MB. Export a smaller file.', true); return; }
+    var reader = new FileReader();
+    reader.onload = function(){
+      var img = new Image();
+      img.onload = function(){ logo = {file:{data:reader.result, ext:ext}, ratio:Math.round((img.naturalWidth / img.naturalHeight || 2) * 1000) / 1000}; renderLogo(); };
+      img.onerror = function(){ toast(f.name + ' could not be read.', true); };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(f);
+  }
+  $('e-logo').onclick = function(e){ if(e.target.closest('.x')){ logo = null; renderLogo(); return; } pickOne(takeLogo, 'image/svg+xml,image/png,image/webp'); };
+  $('e-logo').ondragover = function(e){ e.preventDefault(); this.classList.add('drag'); };
+  $('e-logo').ondragleave = function(){ this.classList.remove('drag'); };
+  $('e-logo').ondrop = function(e){ e.preventDefault(); this.classList.remove('drag'); if(e.dataTransfer.files[0]) takeLogo(e.dataTransfer.files[0]); };
 
   function renderPhotos(){
     var box = $('e-photos');
@@ -839,18 +866,19 @@ var Events = (function(){
   });
 
   function reset(){
-    editing = null; photos = [];
+    editing = null; photos = []; logo = null;
     $('e-title').value = ''; $('e-story').value = '';
     $('e-form-title').textContent = 'Add event'; $('e-save').textContent = 'Publish event'; $('e-cancel').hidden = true;
-    renderPhotos(); renderList();
+    renderPhotos(); renderLogo(); renderList();
   }
   function edit(slug){
     var ev = items[slug]; if(!ev) return;
     editing = slug;
     photos = JSON.parse(JSON.stringify(ev.photos || []));
+    logo = ev.logo ? {file:ev.logo, ratio:ev.logoRatio} : null;
     $('e-title').value = ev.title || ''; $('e-story').value = ev.story || '';
     $('e-form-title').textContent = 'Edit event'; $('e-save').textContent = 'Publish changes'; $('e-cancel').hidden = false;
-    renderPhotos(); renderList();
+    renderPhotos(); renderLogo(); renderList();
     $('e-form').scrollIntoView({behavior:'smooth', block:'start'});
   }
   function save(){
@@ -866,10 +894,11 @@ var Events = (function(){
       story: $('e-story').value.trim(),
       photos: photos.map(function(ph){ return {file:place(ph.file, 'photo'), ratio:ph.ratio || 1.333, alt:(ph.alt || '').trim()}; })
     };
+    if(logo){ data.logo = place(logo.file, 'logo'); data.logoRatio = logo.ratio || 2; }
     changes[dir(slug) + '/event.json'] = json(data);
     var newOrder = order.slice();
     if(isNew){ newOrder.push(slug); changes['events/index.json'] = json({events:newOrder}); }
-    var keep = ['event.json'].concat(data.photos.map(function(ph){ return ph.file; }));
+    var keep = ['event.json', data.logo].concat(data.photos.map(function(ph){ return ph.file; }));
     busy('Publishing event…');
     (isNew ? Promise.resolve() : pruneFolder(dir(slug), keep, changes)).then(function(){
       return commit(changes, (isNew ? 'Add event: ' : 'Update event: ') + title.replace(/\n/g, ' '));

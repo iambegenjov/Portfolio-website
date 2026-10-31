@@ -105,6 +105,17 @@ export default function Events({ event, first }) {
     <section className="events" id={first ? 'events' : `events-${event.slug}`}>
       <div className="wrap events-head">
         {first && <p className="eyebrow">Events</p>}
+        {event.logo &&
+          (event.logo.mono ? (
+            <span
+              className="events-logo"
+              role="img"
+              aria-label={`${event.title.split('\n')[0]} logo`}
+              style={{ aspectRatio: event.logo.ratio, WebkitMaskImage: `url('${event.logo.src}')`, maskImage: `url('${event.logo.src}')` }}
+            />
+          ) : (
+            <img className="events-logo" src={event.logo.src} alt={`${event.title.split('\n')[0]} logo`} style={{ aspectRatio: event.logo.ratio }} />
+          ))}
         <h2>
           {event.title.split('\n').map((line, i) => (
             <span key={i}>

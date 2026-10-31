@@ -21,6 +21,8 @@ export function getEvents() {
           slug,
           title: e.title || '',
           story: e.story || '',
+          // Optional event logo above the title: an SVG takes the text colour (light/dark flip), other images keep theirs
+          logo: e.logo ? { src: asset(`/events/${slug}/${encodeURI(e.logo)}`), ratio: Number(e.logoRatio) || 2, mono: /\.svg$/i.test(e.logo) } : null,
           photos: (e.photos || [])
             .filter((p) => p.file)
             .map((p) => ({ src: asset(`/events/${slug}/${encodeURI(p.file)}`), ratio: Number(p.ratio) || 1.333, alt: p.alt || '' })),
