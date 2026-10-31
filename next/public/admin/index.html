@@ -138,6 +138,9 @@
   .side{display:flex; flex-direction:column; gap:32px; position:sticky; top:104px;}
   @media (max-width:980px){ .side{position:static;} }
   .side h2{font-size:24px;}
+  .order-bar{display:flex; align-items:center; gap:8px; margin:0 0 16px; padding:10px 10px 10px 16px; border-radius:14px; background:rgba(21,16,12,.06); font-size:14px;}
+  .order-bar[hidden]{display:none;}
+  .order-bar span{flex:1; color:var(--muted);}
   .list-head{display:flex; align-items:baseline; justify-content:space-between; margin-bottom:16px;}
   .count{color:var(--muted); font-size:13px;}
   .list{display:grid; grid-template-columns:repeat(auto-fill, minmax(150px,1fr)); gap:14px;}
@@ -341,7 +344,8 @@
   <aside class="side">
     <section>
       <div class="list-head"><h2>Your projects</h2><span class="count" id="p-count"></span></div>
-      <p class="help">Click a project to edit it. Use the arrows to change the order in Works.</p>
+      <p class="help">Click a project to edit it. Use the arrows to change the order in Works, then press Save order.</p>
+      <div class="order-bar" id="p-orderbar" hidden><span>Order changed, not saved yet.</span><button type="button" class="pill small" data-undo>Undo</button><button type="button" class="pill dark small" data-save-order>Save order</button></div>
       <div class="list" id="p-list"></div>
     </section>
   </aside>
@@ -384,7 +388,8 @@
   <aside class="side">
     <section>
       <div class="list-head"><h2>Your events</h2><span class="count" id="e-count"></span></div>
-      <p class="help">Click an event to edit it. Use the arrows to change the order on the home page.</p>
+      <p class="help">Click an event to edit it. Use the arrows to change the order on the home page, then press Save order.</p>
+      <div class="order-bar" id="e-orderbar" hidden><span>Order changed, not saved yet.</span><button type="button" class="pill small" data-undo>Undo</button><button type="button" class="pill dark small" data-save-order>Save order</button></div>
       <div class="list" id="e-list"></div>
     </section>
   </aside>
@@ -611,7 +616,7 @@ function placer(dir, changes){
 
 /* ======================= PROJECTS ======================= */
 var Projects = (function(){
-  var order = [], items = {}, editing = null, draft = empty();
+  var order = [], saved = [], items = {}, editing = null, draft = empty();
   function empty(){ return {card:null, gallery:[]}; }
   function dir(slug){ return 'projects/' + slug; }
 
@@ -621,7 +626,7 @@ var Projects = (function(){
       return Promise.all(order.map(function(slug){
         return readJSON(dir(slug) + '/project.json').then(function(p){ items[slug] = p; }).catch(function(){ items[slug] = {title:slug}; });
       }));
-    }).catch(function(){ order = []; items = {}; }).then(function(){ reset(); });
+    }).catch(function(){ order = []; items = {}; }).then(function(){ saved = order.slice(); reset(); });
   }
 
   function wireDrop(el, get, set, label){
@@ -659,6 +664,7 @@ var Projects = (function(){
   }
   function renderList(){
     var list = $('p-list');
+    $('p-orderbar').hidden = order.join() === saved.join();
     $('p-count').textContent = order.length ? order.length + (order.length === 1 ? ' project' : ' projects') : '';
     if(!order.length){ list.innerHTML = '<div class="empty">No projects yet. Add your first one with the form.</div>'; return; }
     list.innerHTML = order.map(function(slug, i){
@@ -725,7 +731,7 @@ var Projects = (function(){
     (isNew ? Promise.resolve() : pruneFolder(dir(slug), keep, changes)).then(function(){
       return commit(changes, (isNew ? 'Add project: ' : 'Update project: ') + title);
     }).then(function(){
-      items[slug] = data; order = newOrder; reset();
+      items[slug] = data; order = newOrder; if(isNew) saved = newOrder.slice(); reset();
       toast(isNew ? 'Published. It will be live in about a minute.' : 'Changes published. Live in about a minute.');
     }).catch(function(e){ toast('Could not publish: ' + e.message, true); })
       .then(function(){ busy(null); });
@@ -738,23 +744,30 @@ var Projects = (function(){
     pruneFolder(dir(slug), [], changes).then(function(){
       return commit(changes, 'Remove project: ' + (p.title || slug));
     }).then(function(){
-      delete items[slug]; order = newOrder;
+      delete items[slug]; order = newOrder; saved = newOrder.slice();
       if(editing === slug) reset(); else renderList();
       toast('Project removed.');
     }).catch(function(err){ toast('Could not remove: ' + err.message, true); })
       .then(function(){ busy(null); });
   }
+  // Arrows only rearrange the list here; Save order publishes all the moves in one commit
   function move(slug, d){
-    if(!connected){ toast('Log in first.', true); return; }
     var i = order.indexOf(slug), j = i + d;
     if(j < 0 || j >= order.length) return;
-    var newOrder = order.slice(); newOrder[i] = newOrder[j]; newOrder[j] = slug;
+    order[i] = order[j]; order[j] = slug;
+    renderList();
+  }
+  function saveOrder(){
+    if(!connected){ toast('Log in first.', true); return; }
+    var newOrder = order.slice();
     busy('Saving order…');
     commit({'projects/index.json': json({projects:newOrder})}, 'Reorder projects')
-      .then(function(){ order = newOrder; renderList(); toast('Order saved.'); })
+      .then(function(){ saved = newOrder; renderList(); toast('Order saved. Live in about a minute.'); })
       .catch(function(err){ toast('Could not save the order: ' + err.message, true); })
       .then(function(){ busy(null); });
   }
+  $('p-orderbar').querySelector('[data-save-order]').onclick = saveOrder;
+  $('p-orderbar').querySelector('[data-undo]').onclick = function(){ order = saved.slice(); renderList(); };
   $('p-save').onclick = save;
   $('p-cancel').onclick = reset;
   return {load:load};
@@ -762,7 +775,7 @@ var Projects = (function(){
 
 /* ======================= EVENTS ======================= */
 var Events = (function(){
-  var order = [], items = {}, editing = null, photos = [];
+  var order = [], saved = [], items = {}, editing = null, photos = [];
   function dir(slug){ return 'events/' + slug; }
 
   function load(){
@@ -771,7 +784,7 @@ var Events = (function(){
       return Promise.all(order.map(function(slug){
         return readJSON(dir(slug) + '/event.json').then(function(e){ items[slug] = e; }).catch(function(){ items[slug] = {title:slug, photos:[]}; });
       }));
-    }).catch(function(){ order = []; items = {}; }).then(function(){ reset(); });
+    }).catch(function(){ order = []; items = {}; }).then(function(){ saved = order.slice(); reset(); });
   }
 
   function renderPhotos(){
@@ -803,6 +816,7 @@ var Events = (function(){
 
   function renderList(){
     var list = $('e-list');
+    $('e-orderbar').hidden = order.join() === saved.join();
     $('e-count').textContent = order.length ? order.length + (order.length === 1 ? ' event' : ' events') : '';
     if(!order.length){ list.innerHTML = '<div class="empty">No events yet.</div>'; return; }
     list.innerHTML = order.map(function(slug, i){
@@ -860,7 +874,7 @@ var Events = (function(){
     (isNew ? Promise.resolve() : pruneFolder(dir(slug), keep, changes)).then(function(){
       return commit(changes, (isNew ? 'Add event: ' : 'Update event: ') + title.replace(/\n/g, ' '));
     }).then(function(){
-      items[slug] = data; order = newOrder; reset();
+      items[slug] = data; order = newOrder; if(isNew) saved = newOrder.slice(); reset();
       toast(isNew ? 'Event published. Live in about a minute.' : 'Changes published. Live in about a minute.');
     }).catch(function(e){ toast('Could not publish: ' + e.message, true); })
       .then(function(){ busy(null); });
@@ -873,23 +887,30 @@ var Events = (function(){
     pruneFolder(dir(slug), [], changes).then(function(){
       return commit(changes, 'Remove event: ' + String((items[slug] || {}).title || slug).replace(/\n/g, ' '));
     }).then(function(){
-      delete items[slug]; order = newOrder;
+      delete items[slug]; order = newOrder; saved = newOrder.slice();
       if(editing === slug) reset(); else renderList();
       toast('Event removed.');
     }).catch(function(err){ toast('Could not remove: ' + err.message, true); })
       .then(function(){ busy(null); });
   }
+  // Arrows only rearrange the list here; Save order publishes all the moves in one commit
   function move(slug, d){
-    if(!connected){ toast('Log in first.', true); return; }
     var i = order.indexOf(slug), j = i + d;
     if(j < 0 || j >= order.length) return;
-    var newOrder = order.slice(); newOrder[i] = newOrder[j]; newOrder[j] = slug;
+    order[i] = order[j]; order[j] = slug;
+    renderList();
+  }
+  function saveOrder(){
+    if(!connected){ toast('Log in first.', true); return; }
+    var newOrder = order.slice();
     busy('Saving order…');
     commit({'events/index.json': json({events:newOrder})}, 'Reorder events')
-      .then(function(){ order = newOrder; renderList(); toast('Order saved.'); })
+      .then(function(){ saved = newOrder; renderList(); toast('Order saved. Live in about a minute.'); })
       .catch(function(err){ toast('Could not save the order: ' + err.message, true); })
       .then(function(){ busy(null); });
   }
+  $('e-orderbar').querySelector('[data-save-order]').onclick = saveOrder;
+  $('e-orderbar').querySelector('[data-undo]').onclick = function(){ order = saved.slice(); renderList(); };
   $('e-save').onclick = save;
   $('e-cancel').onclick = reset;
   return {load:load};
