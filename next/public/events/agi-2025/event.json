@@ -1,8 +1,6 @@
 {
   "title": "AGI Open 2025,\nHo Chi Minh City",
   "story": "Two days at AGI Open in Ho Chi Minh City, learning from some of the world's most respected designers. Meeting Porto Rocha and Lisa Enebeis turned names on a screen into real conversations, and reminded me that good design is clarity, earned through care.",
-  "logo": "logo.svg",
-  "logoRatio": 2.096,
   "photos": [
     {
       "file": "01.jpg",
@@ -12,17 +10,44 @@
     {
       "file": "03.jpg",
       "ratio": 1.333,
-      "alt": "A group photo in front of the AGI Open 2025 screens"
+      "alt": ""
+    },
+    {
+      "file": "photo-mvwlqv5h-0.jpg",
+      "ratio": 1.778,
+      "alt": ""
+    },
+    {
+      "file": "photo-mvwlqv5h-1.jpg",
+      "ratio": 0.755,
+      "alt": ""
     },
     {
       "file": "02.jpg",
       "ratio": 1.333,
-      "alt": "Muhammet with fellow designers at AGI Open 2025"
+      "alt": ""
+    },
+    {
+      "file": "photo-mvwlqv5h-2.jpg",
+      "ratio": 0.75,
+      "alt": ""
     },
     {
       "file": "04.jpg",
       "ratio": 1.333,
-      "alt": "Muhammet with friends at AGI Open 2025"
+      "alt": ""
+    },
+    {
+      "file": "photo-mvwlqv5h-3.jpg",
+      "ratio": 1.778,
+      "alt": ""
+    },
+    {
+      "file": "photo-mvwlqv5h-4.jpg",
+      "ratio": 0.755,
+      "alt": ""
     }
-  ]
+  ],
+  "logo": "logo.svg",
+  "logoRatio": 2.096
 }
