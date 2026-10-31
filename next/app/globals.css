@@ -422,6 +422,9 @@ body.is-dark .back-top{background:rgba(244,239,230,.1); color:var(--dark-ink);}
 }
 .cta-panel h2{font-size:clamp(36px,6vw,96px); line-height:1.05; letter-spacing:-.02em; max-width:12em;}
 .cta-panel .pill{margin-top:48px; background:#15100c; color:var(--dark-ink); border-color:#15100c;}
+/* Touch screens: no sticking. Mobile Safari colours its toolbar from whatever is pinned to the bottom edge,
+   so the sticky yellow panel tinted the bar yellow on every page. In normal flow the panel just follows the page. */
+@media (hover:none){ .cta-panel{position:relative;} }
 
 /* FOOTER (bottom layer: normal flow, tucked under the CTA rounded corners) */
 footer{
