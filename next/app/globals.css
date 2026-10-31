@@ -420,3 +420,36 @@ footer .foot-bottom{padding-top:20px; background:linear-gradient(rgba(244,239,23
 }
 .cards-error{color:var(--muted); font-size:15px; padding:40px 0;}
 
+
+/* PHONES: tighter rhythm, a hero headline that reads at phone size, no screen-tall empty panels */
+@media (max-width:700px){
+  .hero{min-height:78svh;}
+  .hero-inner{padding-top:64px; padding-bottom:40px;}
+  .hero h1{font-size:clamp(34px,10vw,44px); line-height:1.06; text-wrap:balance;}
+  .chip-rows{margin-top:18px; gap:10px;}
+  .chips{gap:8px 20px; font-size:14px;}
+
+  .about{padding:16px 0 56px;}
+  .about h2{font-size:clamp(24px,6.6vw,30px);}
+  .studies{padding:56px 0 40px;}
+  .studies .pill{margin-top:28px;}
+  .cards{margin-top:28px;}
+  .events{padding:32px 0 64px;}
+  .events-story p{font-size:16px;}
+  .moments-stage{--h-small:96px; --h-big:300px; margin-top:28px;}
+  .services{padding:64px 0 128px;}
+  .rows{margin-top:40px;}
+  .row{gap:6px; padding:20px 0;}
+  .row h3{font-size:22px;}
+  .row p{font-size:15px;}
+  .row:hover h3{transform:translateX(16px);}
+  .row:hover p{transform:translateX(16px);}
+  .back-top{left:20px; bottom:24px;}
+
+  .cta-panel{min-height:auto; padding:88px 20px 64px;}
+  .cta-panel h2{font-size:clamp(34px,10vw,44px);}
+  .cta-panel .pill{margin-top:32px;}
+  footer{min-height:auto; padding:88px 0 20px;}
+  .foot-bottom{margin-top:48px;}
+  .foot-wordmark{padding-top:40px;}
+}
