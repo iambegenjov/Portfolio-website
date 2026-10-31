@@ -6,6 +6,7 @@ import About from '@/components/About';
 import DarkFlip from '@/components/DarkFlip';
 import { getProjects, projectImage } from '@/lib/projects';
 import { getEvents } from '@/lib/events';
+import { getSite } from '@/lib/site';
 
 export default function Home() {
   const projects = getProjects().map((p) => ({
@@ -18,7 +19,7 @@ export default function Home() {
   return (
     <>
       <DarkFlip />
-      <Hero count={projects.length} />
+      <Hero count={projects.length} site={getSite()} />
       <About />
       <Works projects={projects} />
       {getEvents().map((event, i) => (
