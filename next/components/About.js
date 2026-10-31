@@ -1,10 +1,23 @@
+import { asset } from '@/lib/paths';
+import Rotator from './Rotator';
+
+const PLACES = ['the UK', 'the US', 'the UAE'];
+
 export default function About() {
   return (
     <section className="about" id="about">
       <div className="wrap">
         <div className="about-box about-grid">
           <p className="eyebrow">About</p>
-          <h2>I design brand and digital work for clients who'd rather be understood at a glance than explained at length.</h2>
+          <div className="about-text">
+            <img className="about-photo" src={asset('/about/muhammet.jpg')} alt="Muhammet Begenjov" width="640" height="640" loading="lazy" />
+            <h2 aria-label="A graphic designer from Turkmenistan, working with brands in the UK, the US and the UAE.">
+              A graphic designer from Turkmenistan, working with{' '}
+              <span className="nowrap">
+                brands in <Rotator words={PLACES} />.
+              </span>
+            </h2>
+          </div>
         </div>
       </div>
     </section>

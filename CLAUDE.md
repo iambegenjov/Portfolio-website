@@ -30,6 +30,6 @@ Vercel: project portfolio-website, live at https://begenjov.vercel.app, deploys 
 - **Preview first:** the owner reviews every change on the claude.ai preview Artifact before it is treated as final.
 - Keep the owner's exact pixel values listed in docs/HANDOFF.md unless asked to change them.
 - Project pages have no cover photo at the top (owner removed it); they open on the title panel.
-- No added animation libraries or effects: the owner removed the Three.js hero, Lenis smooth scrolling and GSAP reveals. Keep only the original interactions (dark flip, services pill, card hover, nav hide, AGI 2025 strip).
+- No added animation libraries or effects: the owner removed the Three.js hero, Lenis smooth scrolling and GSAP reveals. Keep only the original interactions (dark flip, services pill, card hover, nav hide, AGI 2025 strip). The rolling UK / US / UAE word in About (`components/Rotator.js`) is plain CSS transitions; the owner tried GSAP for it and asked to remove it again (2026-10-31).
 - Photos: card 2:3 (at least 700×1050), cover and single rows 16:10 (1600×1000), split rows 4:5. Compress to JPEG around quality 70.
 - Owner gives short, precise instructions and wants results identical to the references. Proceed with sensible defaults rather than asking many questions.

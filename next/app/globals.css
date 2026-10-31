@@ -368,18 +368,28 @@ body.is-dark .events-story p{color:var(--dark-ink);}
 
 /* ABOUT */
 .about{
-  padding:110px 0; background:var(--bg); color:var(--ink);
+  padding:64px 0 110px; background:var(--bg); color:var(--ink);
   transition:background-color .5s ease, color .5s ease;
 }
 body.is-dark .about{background:var(--dark-bg); color:var(--dark-ink);}
 .about-grid{display:grid; grid-template-columns:220px 1fr; gap:40px;}
+/* "About" stays in the left column; the round portrait sits left of the text */
+.about-box.about-grid{grid-template-columns:1fr; gap:clamp(28px,3vw,40px);} /* label on top, photo + text underneath */
+.about-text{display:flex; align-items:center; gap:clamp(24px,3vw,44px);}
+.about-photo{display:block; flex:none; width:clamp(112px,12vw,180px); height:auto; aspect-ratio:1; object-fit:cover; border-radius:50%;}
 /* The About text sits in a soft rounded box inside the page margins */
 .about-box{background:#ebe7de; border-radius:24px; padding:clamp(40px,5vw,72px) clamp(28px,4vw,64px);}
-.about-box .eyebrow{margin:.45em 0 0;}
-@media (max-width:700px){ .about-box{border-radius:20px;} .about-box.about-grid{gap:16px;} }
+.about-box .eyebrow{margin:0;}
+@media (max-width:700px){ .about-box{border-radius:20px;} .about-box.about-grid{gap:16px;} .about-text{flex-direction:column; align-items:flex-start; gap:20px;} .about-photo{width:112px;} }
 @media (max-width:700px){ .about-grid{grid-template-columns:1fr;} }
-.about h2{font-size:clamp(26px,3.6vw,42px); line-height:1.2; max-width:640px; color:var(--ink); transition:color .5s ease;}
+.about h2{font-size:clamp(26px,3.6vw,42px); line-height:1.2; max-width:740px; color:var(--ink); transition:color .5s ease;}
 body.is-dark .about h2{color:var(--dark-ink);}
+.about h2 .nowrap{white-space:nowrap;} /* the rolling word stays on its line, so nothing reflows as it changes */
+/* Rolling place name in the About line (Rotator.js): one word visible, the next slides up from below */
+.rotator{display:inline-block; vertical-align:bottom; height:1.2em; overflow:hidden; transition:width .6s cubic-bezier(.65,0,.35,1);}
+.rotator-track{display:flex; flex-direction:column; transition:transform .6s cubic-bezier(.65,0,.35,1);}
+.rotator-track > span{display:block; height:1.2em; white-space:nowrap; width:max-content;}
+.rotator.is-snap, .rotator.is-snap .rotator-track{transition:none;}
 .about .eyebrow{color:var(--muted); transition:color .5s ease;}
 body.is-dark .about .eyebrow{color:var(--dark-muted);}
 .back-top{
