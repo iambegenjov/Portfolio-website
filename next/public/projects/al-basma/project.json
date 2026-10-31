@@ -16,5 +16,19 @@
   "description": "Coming Soon...",
   "card": "card-mvwmu0ym-0.jpg",
   "cover": "cover.jpg",
-  "gallery": []
+  "gallery": [
+    {
+      "type": "single",
+      "images": [
+        "gallery-mvwultxm-0.jpg"
+      ]
+    },
+    {
+      "type": "split",
+      "images": [
+        "gallery-mvwultxm-1.jpg",
+        "gallery-mvwultxm-2.jpg"
+      ]
+    }
+  ]
 }
