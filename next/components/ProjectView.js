@@ -26,6 +26,18 @@ export default function ProjectView({ project: p, next }) {
     };
   }, [p.slug]);
 
+  // Back returns to where the visitor came from on this site (keeping the scroll position), else to Works
+  const back = (e) => {
+    let local = false;
+    try {
+      local = !!document.referrer && new URL(document.referrer).origin === location.origin;
+    } catch {}
+    if (local && history.length > 1) {
+      e.preventDefault();
+      history.back();
+    }
+  };
+
   const groups = [
     ['Industry', p.category ? [p.category] : []],
     ['Discipline', p.tags || []],
@@ -35,6 +47,10 @@ export default function ProjectView({ project: p, next }) {
     <article className="project">
       <div className="pj-panel">
         <div className="pj-intro">
+          <Link className="pj-back" href="/#work" onClick={back}>
+            <Arrow />
+            Back
+          </Link>
           <h1 className="pj-headline">
             {p.title}
           </h1>

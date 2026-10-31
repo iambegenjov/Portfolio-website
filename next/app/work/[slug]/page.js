@@ -16,7 +16,7 @@ export async function generateMetadata({ params }) {
   return {
     title: `${p.title} — Muhammet Begenjov`,
     description: desc,
-    openGraph: { title: p.title, description: desc, images: p.cover ? [projectImage(p, p.cover)] : [] },
+    openGraph: { title: p.title, description: desc, images: p.card ? [projectImage(p, p.card)] : [] },
   };
 }
 
@@ -35,7 +35,6 @@ export default async function ProjectPage({ params }) {
     tags: p.tags || [],
     paragraphs: paragraphs(p.description),
     cardUrl: projectImage(p, p.card),
-    coverUrl: projectImage(p, p.cover),
     rows: (p.gallery || []).map((r) => ({
       type: r.type === 'split' ? 'split' : 'single',
       images: (r.images || []).map((f) => projectImage(p, f)),

@@ -296,15 +296,11 @@
       <div class="step-no">01</div>
       <div>
         <h3>Images</h3>
-        <p class="help">The card image is the portrait photo in Works (2:3, at least 700×1050). The share image is optional: it shows when the project link is shared on social media or in messages (landscape, 1600×1000).</p>
+        <p class="help">The card image is the portrait photo in Works (2:3, at least 700×1050). It is also the picture shown when the project link is shared.</p>
         <div class="drops">
           <div>
             <div class="drop portrait" id="drop-card"></div>
             <div class="drop-label">Project card</div>
-          </div>
-          <div>
-            <div class="drop landscape" id="drop-cover"></div>
-            <div class="drop-label">Share image (optional)</div>
           </div>
         </div>
       </div>
@@ -435,7 +431,7 @@
    from the GitHub repository and publishes every save as one commit; Vercel rebuilds the site from it.
    GitHub calls go through /api/admin/github, where the server adds its token (lib/admin-auth.js).
    Data (paths inside SITE_DIR, which is next/public/ in the repository):
-     projects/index.json {projects:[slug]}   projects/<slug>/project.json {title, category, year, tags, description, card, cover, gallery:[{type, images}]}
+     projects/index.json {projects:[slug]}   projects/<slug>/project.json {title, category, year, tags, description, card, gallery:[{type, images}]}
      events/index.json   {events:[slug]}     events/<slug>/event.json     {title, story, photos:[{file, ratio, alt}]}
      site.json           {email, resume, instagram, linkedin, ctaHeading, ctaButton}
    Image values in the editors are either an existing file name or {data:dataURL, ratio} for a new upload. */
@@ -616,7 +612,7 @@ function placer(dir, changes){
 /* ======================= PROJECTS ======================= */
 var Projects = (function(){
   var order = [], items = {}, editing = null, draft = empty();
-  function empty(){ return {card:null, cover:null, gallery:[]}; }
+  function empty(){ return {card:null, gallery:[]}; }
   function dir(slug){ return 'projects/' + slug; }
 
   function load(){
@@ -641,7 +637,6 @@ var Projects = (function(){
   }
   function render(){
     wireDrop($('drop-card'), function(){ return draft.card; }, function(v){ draft.card = v; }, 'Add card image');
-    wireDrop($('drop-cover'), function(){ return draft.cover; }, function(v){ draft.cover = v; }, 'Add share image');
     var box = $('rows');
     if(!draft.gallery.length) box.innerHTML = '<div class="rows-empty">No image rows yet. Add a single landscape image or two images side by side.</div>';
     else box.innerHTML = draft.gallery.map(function(r, i){
@@ -697,7 +692,7 @@ var Projects = (function(){
   function edit(slug){
     var p = items[slug]; if(!p) return;
     editing = slug;
-    draft = {card:p.card || null, cover:p.cover || null, gallery:JSON.parse(JSON.stringify(p.gallery || []))};
+    draft = {card:p.card || null, gallery:JSON.parse(JSON.stringify(p.gallery || []))};
     $('f-name').value = p.title || ''; $('f-category').value = p.category || ''; $('f-year').value = p.year || '';
     $('f-tags').value = (p.tags || []).join(', '); $('f-desc').value = p.description || '';
     $('p-form-title').textContent = 'Edit project'; $('p-save').textContent = 'Publish changes'; $('p-cancel').hidden = false;
@@ -718,14 +713,13 @@ var Projects = (function(){
       tags: $('f-tags').value.split(',').map(function(s){ return s.trim(); }).filter(Boolean),
       description: $('f-desc').value.trim(),
       card: place(draft.card, 'card'),
-      cover: place(draft.cover, 'cover'),
       gallery: draft.gallery.map(function(r){ return {type:r.type, images:r.images.map(function(v){ return place(v, 'gallery'); }).filter(Boolean)}; })
                             .filter(function(r){ return r.images.length; })
     });
     changes[dir(slug) + '/project.json'] = json(data);
     var newOrder = order.slice();
     if(isNew){ newOrder.push(slug); changes['projects/index.json'] = json({projects:newOrder}); }
-    var keep = ['project.json', data.card, data.cover];
+    var keep = ['project.json', data.card];
     data.gallery.forEach(function(r){ keep = keep.concat(r.images); });
     busy('Publishing ' + title + '…');
     (isNew ? Promise.resolve() : pruneFolder(dir(slug), keep, changes)).then(function(){

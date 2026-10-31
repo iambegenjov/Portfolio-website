@@ -256,9 +256,18 @@ a.card{display:block; color:inherit;}
 }
 .pj-intro{display:grid; grid-template-columns:15.2fr 45.3fr 9.2fr 15fr 15.2fr;}
 /* Title on its own row, so the side column starts level with the description */
-.pj-intro > .pj-headline{grid-column:2; grid-row:1;}
-.pj-main{grid-column:2; grid-row:2;}
-.pj-side{grid-column:4; grid-row:2;}
+.pj-back{
+  grid-column:2; grid-row:1; justify-self:start; display:inline-flex; align-items:center; gap:10px; margin:0 0 48px;
+  padding:10px 20px 10px 16px; border:1px solid var(--line); border-radius:999px;
+  font-size:15px; line-height:1; color:var(--ink);
+  transition:background-color .25s ease, color .25s ease, border-color .25s ease;
+}
+.pj-back:hover{background:var(--ink); color:var(--bg); border-color:var(--ink);}
+.pj-back svg{width:16px; height:16px; transform:rotate(180deg); transition:transform .25s ease;}
+.pj-back:hover svg{transform:rotate(180deg) translateX(4px);} /* nudges left */
+.pj-intro > .pj-headline{grid-column:2; grid-row:2;}
+.pj-main{grid-column:2; grid-row:3;}
+.pj-side{grid-column:4; grid-row:3;}
 .pj-name{font-family:var(--font-display), Georgia, serif; font-style:italic; font-size:clamp(17px,1.8vw,22px); line-height:1.4; margin:0 0 18px;}
 .pj-headline{font-size:clamp(28px,3.4vw,44px); line-height:1.1; letter-spacing:-.01em; /* same size as the Next project title */ margin:0 0 60px; max-width:560px;}
 .pj-text p{font-size:18px; line-height:1.6; margin:0 0 14px; max-width:560px;}
@@ -310,8 +319,9 @@ a.card{display:block; color:inherit;}
 @media (max-width:800px){
   .pj-panel{padding:48px 0 100px;}
   .pj-intro{grid-template-columns:20px 1fr 20px;}
-  .pj-main, .pj-side, .pj-intro > .pj-headline{grid-column:2;}
-  .pj-side{grid-row:3; margin-top:40px;}
+  .pj-back, .pj-main, .pj-side, .pj-intro > .pj-headline{grid-column:2;}
+  .pj-back{margin-bottom:32px;}
+  .pj-side{grid-row:4; margin-top:40px;}
   .pj-next{margin:100px 20px 0;}
   .pj-text p, .pj-more{font-size:17px;} /* Read more always matches the description size */
 }
