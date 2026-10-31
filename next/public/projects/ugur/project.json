@@ -13,29 +13,8 @@
     "Digital Design",
     "Tone of Voice"
   ],
-  "description": "\"Delivering Promise\": a brand for a logistics company built on reliability.\n\nLogistics is a trust business. The Ugur identity is built to look dependable at every scale, from a business card to the side of a truck.\n\nA simple mark, a strong colour and a strict layout system keep the brand consistent across vehicles, documents and digital channels.",
+  "description": "Coming Soon...",
   "card": "card.jpg",
   "cover": "cover.jpg",
-  "gallery": [
-    {
-      "type": "split",
-      "images": [
-        "gallery-01.jpg",
-        "gallery-02.jpg"
-      ]
-    },
-    {
-      "type": "single",
-      "images": [
-        "gallery-03.jpg"
-      ]
-    },
-    {
-      "type": "split",
-      "images": [
-        "gallery-04.jpg",
-        "gallery-05.jpg"
-      ]
-    }
-  ]
+  "gallery": []
 }
