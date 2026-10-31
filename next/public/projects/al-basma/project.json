@@ -20,14 +20,20 @@
     {
       "type": "single",
       "images": [
-        "gallery-mvwultxm-0.jpg"
+        "gallery-mvwv5gfm-0.jpg"
       ]
     },
     {
       "type": "split",
       "images": [
-        "gallery-mvwultxm-1.jpg",
-        "gallery-mvwultxm-2.jpg"
+        "gallery-mvwv5gfm-1.jpg",
+        "gallery-mvwv5gfm-2.jpg"
+      ]
+    },
+    {
+      "type": "single",
+      "images": [
+        "gallery-mvwv5gfm-3.jpg"
       ]
     }
   ]
