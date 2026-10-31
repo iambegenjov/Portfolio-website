@@ -22,7 +22,10 @@ export default function Events({ event, first }) {
     const items = () => [...track.querySelectorAll('.moment')];
     const setActive = (el) => items().forEach((o) => o.classList.toggle('is-active', o === el));
 
+    // Touch screens: the photo passing the middle of the screen pops up by itself (see tick)
+    const touch = window.matchMedia('(hover: none)').matches;
     const onClick = (e) => {
+      if (touch && !reduce) return;
       const m = e.target.closest('.moment');
       if (m) setActive(m.classList.contains('is-active') ? null : m);
     };
@@ -65,6 +68,16 @@ export default function Events({ event, first }) {
         const under = document.elementFromPoint(pointer.x, pointer.y);
         const hit = under && under.closest('.moment');
         if (!hit || !hit.classList.contains('is-active')) setActive(hit && track.contains(hit) ? hit : null);
+      } else if (touch) {
+        const r = stage.getBoundingClientRect();
+        const y = r.top + r.height / 2;
+        if (y > innerHeight * 0.2 && y < innerHeight * 0.8) {
+          const under = document.elementFromPoint(innerWidth / 2, y);
+          const hit = under && under.closest('.moment');
+          if (hit && track.contains(hit) && !hit.classList.contains('is-active')) setActive(hit);
+        } else {
+          setActive(null);
+        }
       }
       // A popped-up photo changes the width of its set, so measure every frame
       const all = track.children;

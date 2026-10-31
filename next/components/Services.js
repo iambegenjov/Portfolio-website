@@ -54,7 +54,6 @@ export default function Services() {
                 <h3>{title}</h3>
               </div>
               <p>{text}</p>
-              <span className="arrow">→</span>
             </div>
           ))}
         </div>
