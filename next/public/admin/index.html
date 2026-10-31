@@ -581,11 +581,17 @@ function compressImage(file, maxSide, done){
   reader.onload = function(){
     var img = new Image();
     img.onload = function(){
+      var ratio = Math.round(img.width / img.height * 1000) / 1000;
+      // GIFs are kept as uploaded: drawing them on a canvas keeps only the first frame
+      if(file.type === 'image/gif'){
+        if(file.size > 3 * 1024 * 1024){ toast(file.name + ' is over 3 MB. Make the GIF smaller (fewer frames or a smaller size) and try again.', true); return; }
+        return done({data:reader.result, ratio:ratio, ext:'gif'});
+      }
       var scale = Math.min(1, maxSide / Math.max(img.width, img.height));
       var c = document.createElement('canvas');
       c.width = Math.round(img.width * scale); c.height = Math.round(img.height * scale);
       c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-      done({data:c.toDataURL('image/jpeg', 0.72), ratio:Math.round(img.width / img.height * 1000) / 1000});
+      done({data:c.toDataURL('image/jpeg', 0.72), ratio:ratio});
     };
     img.onerror = function(){ toast(file.name + ' could not be read as an image. Use JPEG or PNG.', true); };
     img.src = reader.result;
@@ -601,7 +607,7 @@ function placer(dir, changes){
   return function(v, role){
     if(!v) return null;
     if(typeof v === 'string') return v;
-    var name = role + '-' + stamp + '-' + (k++) + '.jpg';
+    var name = role + '-' + stamp + '-' + (k++) + '.' + (v.ext || 'jpg');
     changes[dir + '/' + name] = {base64: v.data.split(',')[1]};
     return name;
   };
