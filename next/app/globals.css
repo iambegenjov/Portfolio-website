@@ -344,7 +344,7 @@ body.is-dark .events-story p{color:var(--dark-ink);}
 /* Endless strip: small fully rounded pills drift left; the hovered (or tapped) one pops up
    into a large photo with small rounded corners while the strip pauses (main.js). */
 .moments-stage{
-  --h-small:150px; --h-big:min(58vh, 560px);
+  --h-small:150px; --h-big:min(58vh, 560px); --w-big:min(34vw, 500px); /* a popped-up photo fits inside h-big × w-big */
   margin-top:56px; height:var(--h-big); display:flex; align-items:center; overflow:hidden;
 }
 .moments-stage.is-manual{overflow-x:auto; scrollbar-width:none; padding:0 max(40px, calc((100% - 1400px) / 2 + 40px));}
@@ -356,10 +356,13 @@ body.is-dark .events-story p{color:var(--dark-ink);}
   background:rgba(21,16,12,.08);
   transition:width .28s cubic-bezier(.2,.8,.2,1), height .28s cubic-bezier(.2,.8,.2,1), border-radius .28s cubic-bezier(.2,.8,.2,1);
 }
-.moment.is-active{height:var(--h-big); width:calc(var(--h-big) * var(--r, 1.333)); border-radius:32px; cursor:default;}
+.moment.is-active{
+  --h-pop:min(var(--h-big), calc(var(--w-big) / var(--r, 1.333))); /* landscape photos are capped by width, so they don't grow huge */
+  height:var(--h-pop); width:calc(var(--h-pop) * var(--r, 1.333)); border-radius:32px; cursor:default;
+}
 .moment img{width:100%; height:100%; object-fit:cover; display:block; user-select:none; -webkit-user-drag:none;}
 @media (max-width:700px){
-  .moments-stage{--h-small:100px; --h-big:360px; margin-top:40px;}
+  .moments-stage{--h-small:100px; --h-big:360px; --w-big:72vw; margin-top:40px;}
   .moment.is-active{border-radius:24px;}
 }
 
@@ -447,7 +450,7 @@ footer .foot-bottom{padding-top:20px; background:linear-gradient(rgba(244,239,23
   .cards{margin-top:28px;}
   .events{padding:32px 0 64px;}
   .events-story p{font-size:16px;}
-  .moments-stage{--h-small:96px; --h-big:300px; margin-top:28px;}
+  .moments-stage{--h-small:96px; --h-big:300px; --w-big:72vw; margin-top:28px;}
   .services{padding:64px 0 128px;}
   .rows{margin-top:40px;}
   .row{gap:6px; padding:20px 0;}
