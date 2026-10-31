@@ -2,34 +2,29 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-const STEP = 2200; // ms each word stays
+const STEP = 2800; // ms each name stays
 
-// Words that roll up one after another in a fixed-height slot; the slot's width follows the current word.
-// The first word is repeated at the end so the loop can jump back to it without a visible reset.
-export default function Rotator({ words }) {
-  const list = [...words, words[0]];
+// Names that swap in one slot, word by word: the words of the current name rise out one after another
+// ("United", then "Kingdom"), and the next name's words rise in the same way, starting just after.
+// Plain CSS transitions (globals.css › .rotator); the slot's width eases to the current name.
+// `end` (e.g. a full stop) is attached to each name's last word, so it never lands alone on a line.
+export default function Rotator({ words, end = '' }) {
   const [i, setI] = useState(0);
-  const [snap, setSnap] = useState(false);
+  const [prev, setPrev] = useState(null);
   const [width, setWidth] = useState(null);
   const [still, setStill] = useState(false);
   const refs = useRef([]);
 
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return setStill(true);
-    const t = setInterval(() => setI((n) => n + 1), STEP);
+    const t = setInterval(() => {
+      setI((n) => {
+        setPrev(n);
+        return (n + 1) % words.length;
+      });
+    }, STEP);
     return () => clearInterval(t);
-  }, []);
-
-  // After sliding onto the repeated first word, jump back to the real one with no transition
-  useEffect(() => {
-    if (i < words.length) return;
-    const t = setTimeout(() => {
-      setSnap(true);
-      setI(0);
-      requestAnimationFrame(() => requestAnimationFrame(() => setSnap(false)));
-    }, 700);
-    return () => clearTimeout(t);
-  }, [i, words.length]);
+  }, [words.length]);
 
   useEffect(() => {
     const measure = () => setWidth(refs.current[i]?.offsetWidth || null);
@@ -39,17 +34,27 @@ export default function Rotator({ words }) {
   }, [i]);
 
   // Reduced motion: the whole list, no movement
-  if (still) return <span style={{ whiteSpace: 'normal' }}>{words.slice(0, -1).join(', ') + ' and ' + words[words.length - 1]}</span>;
+  if (still) return <span style={{ whiteSpace: 'normal' }}>{words.slice(0, -1).join(', ') + ' and ' + words[words.length - 1] + end}</span>;
 
   return (
-    <span className={'rotator' + (snap ? ' is-snap' : '')} style={width ? { width } : undefined} aria-hidden="true">
-      <span className="rotator-track" style={{ transform: `translateY(${-i * 1.2}em)` }}>
-        {list.map((w, k) => (
-          <span key={k} ref={(el) => (refs.current[k] = el)}>
-            {w}
+    <span className="rotator" style={width ? { width } : undefined} aria-hidden="true">
+      <span className="rotator-sizer">{words[0] + end}</span>
+      {words.map((w, k) => {
+        const parts = w.split(' ');
+        return (
+          <span
+            key={w}
+            ref={(el) => (refs.current[k] = el)}
+            className={'rotator-word' + (k === i ? ' is-in' : k === prev ? ' is-out' : '')}
+          >
+            {parts.map((p, j) => (
+              <span className="rotator-part" key={j} style={{ '--k': j }}>
+                {p + (j === parts.length - 1 ? end : '')}
+              </span>
+            ))}
           </span>
-        ))}
-      </span>
+        );
+      })}
     </span>
   );
 }

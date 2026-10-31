@@ -385,11 +385,21 @@ body.is-dark .about{background:var(--dark-bg); color:var(--dark-ink);}
 .about h2{font-size:clamp(26px,3.6vw,42px); line-height:1.2; max-width:740px; color:var(--ink); transition:color .5s ease;}
 body.is-dark .about h2{color:var(--dark-ink);}
 .about h2 .nowrap{white-space:nowrap;} /* the rolling word stays on its line, so nothing reflows as it changes */
-/* Rolling place name in the About line (Rotator.js): one word visible, the next slides up from below */
-.rotator{display:inline-block; vertical-align:bottom; height:1.2em; overflow:hidden; transition:width .6s cubic-bezier(.65,0,.35,1);}
-.rotator-track{display:flex; flex-direction:column; transition:transform .6s cubic-bezier(.65,0,.35,1);}
-.rotator-track > span{display:block; height:1.2em; white-space:nowrap; width:max-content;}
-.rotator.is-snap, .rotator.is-snap .rotator-track{transition:none;}
+/* Rolling place name in the About line (Rotator.js): names stacked in one slot; each word of a name rises
+   out (and the next name's words rise in) one after another. Each name masks its own words, so a leaving
+   name isn't cut at the side while the slot narrows; the extra .1em keeps descenders (g, y) visible. */
+.rotator{
+  display:inline-block; position:relative; vertical-align:top; height:1.3em; margin-bottom:-.1em;
+  transition:width .6s cubic-bezier(.65,0,.35,1);
+}
+.rotator-word{display:block; position:absolute; left:0; top:0; height:1.3em; overflow:hidden; white-space:nowrap;}
+.rotator-sizer{visibility:hidden; white-space:nowrap;} /* gives the slot its first width before the script measures it */
+.rotator-part{display:inline-block; margin-right:.25em; transform:translateY(110%);}
+.rotator-part:last-child{margin-right:0;}
+.rotator-word.is-in .rotator-part{transform:none; transition:transform .55s cubic-bezier(.65,0,.35,1) calc(.15s + var(--k) * .12s);}
+.rotator-word.is-out .rotator-part{transform:translateY(-110%); transition:transform .5s cubic-bezier(.65,0,.35,1) calc(var(--k) * .12s);}
+/* Phones: the name gets its own line, so the longest one still fits */
+@media (max-width:700px){ .about h2 .nowrap{white-space:normal;} .rotator{display:block; width:auto !important;} }
 .about .eyebrow{color:var(--muted); transition:color .5s ease;}
 body.is-dark .about .eyebrow{color:var(--dark-muted);}
 .back-top{
