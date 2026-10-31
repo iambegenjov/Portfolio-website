@@ -577,7 +577,8 @@ function loadAll(){
 
 /* ---------------- images ---------------- */
 // Resize in the browser and keep the aspect ratio (events need it for the strip)
-function compressImage(file, maxSide, done){
+// quality: JPEG quality to start from (project page rows use 0.9, cards and event photos 0.72)
+function compressImage(file, maxSide, done, quality){
   var reader = new FileReader();
   reader.onload = function(){
     var img = new Image();
@@ -591,8 +592,14 @@ function compressImage(file, maxSide, done){
       var scale = Math.min(1, maxSide / Math.max(img.width, img.height));
       var c = document.createElement('canvas');
       c.width = Math.round(img.width * scale); c.height = Math.round(img.height * scale);
-      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-      done({data:c.toDataURL('image/jpeg', 0.72), ratio:ratio});
+      var g = c.getContext('2d');
+      g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
+      g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); // transparent PNG areas turn white, not black
+      g.drawImage(img, 0, 0, c.width, c.height);
+      // High quality, stepping down only if the file would pass the 3 MB upload limit (base64 is 4/3 the size)
+      var q = quality || 0.72, data = c.toDataURL('image/jpeg', q);
+      while(data.length > 3.9e6 && q > 0.5){ q -= 0.08; data = c.toDataURL('image/jpeg', q); }
+      done({data:data, ratio:ratio});
     };
     img.onerror = function(){ toast(file.name + ' could not be read as an image. Use JPEG or PNG.', true); };
     img.src = reader.result;
@@ -634,7 +641,10 @@ var Projects = (function(){
     el.innerHTML = ICON_UP + '<strong>' + label + '</strong><span>Click or drop an image</span><button type="button" class="x" title="Remove image" aria-label="Remove image">✕</button>';
     el.classList.toggle('has-img', !!url);
     el.style.backgroundImage = url ? "url('" + url + "')" : '';
-    function take(f){ compressImage(f, el.classList.contains('portrait') ? 1200 : 1600, function(v){ set(v); render(); }); }
+    function take(f){
+      var card = el.classList.contains('portrait'); // project page rows are saved larger and sharper than the card
+      compressImage(f, card ? 1200 : 3000, function(v){ set(v); render(); }, card ? 0.72 : 0.9);
+    }
     el.onclick = function(e){ if(e.target.closest('.x')){ set(null); render(); return; } pickOne(take); };
     el.ondragover = function(e){ e.preventDefault(); el.classList.add('drag'); };
     el.ondragleave = function(){ el.classList.remove('drag'); };
