@@ -36,7 +36,6 @@ export default function Nav() {
 
   return (
     <nav ref={ref}>
-      <div className="topbar" />
       <div className="nav-row">
         <Link className="logo" href="/" aria-label="Muhammet Begenjov">
           <Logo className="logo-mark" />

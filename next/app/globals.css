@@ -34,9 +34,6 @@ a{color:inherit; text-decoration:none;}
 .wrap{max-width:1400px; margin:0 auto; padding:0 40px;}
 @media (max-width:700px){ .wrap{padding:0 20px;} }
 
-/* TOP BAR */
-.topbar{ height:6px; background:var(--ink); }
-
 /* NAV */
 nav{
   position:sticky; top:0; z-index:50;
@@ -249,8 +246,8 @@ body.is-dark .page{background:var(--dark-bg);}
 
 /* PROJECT PAGES (app/work/[slug]). Layout follows fiasco.design/work/boundless without the cover photo:
    intro text on the left, category pills on the right, then the image rows. */
-/* Behind the yellow panel's rounded bottom corners the dark footer colour must show, as on the home page */
-body.on-project{background:var(--dark-bg);}
+/* No dark body colour here: the footer already sits behind the yellow panel's corners, and a dark body showed
+   as a black band above the header when the scroll bounced past the top */
 a.card{display:block; color:inherit;}
 .pj-panel{
   position:relative; z-index:1; padding:80px 0 130px;
