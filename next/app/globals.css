@@ -393,6 +393,7 @@ body.is-dark .about h2{color:var(--dark-ink);}
   transition:width .6s cubic-bezier(.65,0,.35,1);
 }
 .rotator-word{display:block; position:absolute; left:0; top:0; height:1.3em; overflow:hidden; white-space:nowrap;}
+.rotator-word{color:var(--muted);} /* softer than the sentence, like the hero's second line */
 .rotator-sizer{visibility:hidden; white-space:nowrap;} /* gives the slot its first width before the script measures it */
 .rotator-part{display:inline-block; margin-right:.25em; transform:translateY(110%);}
 .rotator-part:last-child{margin-right:0;}
