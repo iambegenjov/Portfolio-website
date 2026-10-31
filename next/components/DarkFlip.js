@@ -2,12 +2,12 @@
 
 import { useEffect } from 'react';
 
-// The home page flips to dark once Services has scrolled fully above the viewport
+// The home page flips to dark once the section above Works has scrolled fully above the viewport
 export default function DarkFlip() {
   useEffect(() => {
-    const services = document.querySelector('.services');
-    if (!services) return;
-    const update = () => document.body.classList.toggle('is-dark', services.getBoundingClientRect().bottom <= 0);
+    const before = document.getElementById('work')?.previousElementSibling;
+    if (!before) return;
+    const update = () => document.body.classList.toggle('is-dark', before.getBoundingClientRect().bottom <= 0);
     update();
     window.addEventListener('scroll', update, { passive: true });
     window.addEventListener('resize', update);

@@ -19,12 +19,12 @@ export default function Home() {
     <>
       <DarkFlip />
       <Hero count={projects.length} />
-      <Services />
+      <About />
       <Works projects={projects} />
       {getEvents().map((event, i) => (
         <Events key={event.slug} event={event} first={i === 0} />
       ))}
-      <About />
+      <Services />
     </>
   );
 }

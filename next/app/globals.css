@@ -101,7 +101,17 @@ body.is-dark .pill.outline{color:var(--dark-ink); border-color:rgba(244,239,230,
 body.is-dark .studies .eyebrow{color:var(--dark-muted);}
 
 /* SERVICES */
-.services{padding:110px 0;}
+.services{padding:110px 0 180px; border-radius:0 0 32px 32px; transition:background-color .5s ease, color .5s ease;} /* last home section: room for the back-to-top button */
+/* Services sits in the dark part of the page: light text, light lines, light pill */
+body.is-dark .services{background:var(--dark-bg); color:var(--dark-ink);}
+body.is-dark .services .eyebrow{color:var(--dark-muted);}
+body.is-dark .services .rows, body.is-dark .services .row{border-color:rgba(244,239,230,.14);}
+body.is-dark .services .row:hover, body.is-dark .services .row:has(+ .row:hover){border-color:transparent;}
+body.is-dark .services .row p{color:var(--dark-muted);}
+body.is-dark .services .row-pill, body.is-dark .services .rows:not(.is-ready) .row:hover::before{background:var(--dark-ink); box-shadow:none;}
+body.is-dark .services .row:hover h3{color:var(--dark-bg);}
+body.is-dark .services .row:hover p{color:rgba(19,13,10,.7);}
+body.is-dark .services .row .arrow{color:var(--dark-bg);}
 .services h2{font-size:clamp(28px,4vw,48px); line-height:1.18; max-width:780px;}
 .rows{position:relative; margin-top:70px; border-top:1px solid var(--line);}
 .row{
@@ -344,12 +354,15 @@ body.is-dark .events-story p{color:var(--dark-ink);}
 
 /* ABOUT */
 .about{
-  padding:110px 0 180px; background:var(--bg); color:var(--ink);
-  border-radius:0 0 32px 32px;
+  padding:110px 0; background:var(--bg); color:var(--ink);
   transition:background-color .5s ease, color .5s ease;
 }
 body.is-dark .about{background:var(--dark-bg); color:var(--dark-ink);}
 .about-grid{display:grid; grid-template-columns:220px 1fr; gap:40px;}
+/* The About text sits in a soft rounded box inside the page margins */
+.about-box{background:#ebe7de; border-radius:24px; padding:clamp(40px,5vw,72px) clamp(28px,4vw,64px);}
+.about-box .eyebrow{margin:.45em 0 0;}
+@media (max-width:700px){ .about-box{border-radius:20px;} .about-box.about-grid{gap:16px;} }
 @media (max-width:700px){ .about-grid{grid-template-columns:1fr;} }
 .about h2{font-size:clamp(26px,3.6vw,42px); line-height:1.2; max-width:640px; color:var(--ink); transition:color .5s ease;}
 body.is-dark .about h2{color:var(--dark-ink);}
