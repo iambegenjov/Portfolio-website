@@ -398,7 +398,7 @@ footer .wrap{width:100%; max-width:none; padding:0 34px;}
 .foot-col a, .foot-col > span{font-size:clamp(16px,1.3vw,20px); line-height:1.35; color:var(--dark-ink);}
 .foot-col a{display:inline-flex; align-items:baseline; gap:.3em; transition:opacity .2s ease;}
 .foot-col a:hover{opacity:.6;}
-.foot-ext{font-size:.75em; color:var(--dark-muted);}
+.foot-ext{width:.7em; height:.7em; flex:none; color:var(--dark-muted);} /* drawn, so phones never show the emoji arrow */
 /* Bottom line: copyright and back to top, above the wordmark */
 .foot-bottom{display:flex; justify-content:space-between; align-items:center; gap:20px; margin-top:96px;}
 footer .foot-bottom{padding-top:20px; background:linear-gradient(rgba(244,239,230,.14), rgba(244,239,230,.14)) 34px 0 / calc(100% - 68px) 1px no-repeat;} /* hairline inside the side padding */
@@ -455,8 +455,8 @@ footer .foot-bottom{padding-top:20px; background:linear-gradient(rgba(244,239,23
     font-family:var(--font-display), Georgia, serif; font-size:24px; line-height:1.2;
   }
   .foot-col > :last-child{border-bottom:1px solid rgba(244,239,230,.14);}
-  .foot-ext{font-family:var(--font-body), sans-serif; font-size:18px;}
+  .foot-ext{width:20px; height:20px;}
   .foot-bottom{margin-top:40px;}
   footer .foot-bottom{background:none; padding-top:0;}
-  .foot-wordmark{padding-top:48px;}
+  footer .foot-wordmark{padding-top:48px;}
 }
