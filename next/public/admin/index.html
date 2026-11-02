@@ -298,7 +298,7 @@
       <div class="step-no">01</div>
       <div>
         <h3>Images</h3>
-        <p class="help">The card image is the portrait photo in Works (2:3, at least 700×1050). It is also the picture shown when the project link is shared.</p>
+        <p class="help">The card image is the portrait photo in Works (2:3, ideally 1200 × 1800 px). It is also the picture shown when the project link is shared.</p>
         <div class="drops">
           <div>
             <div class="drop portrait" id="drop-card"></div>
@@ -373,7 +373,7 @@
       <div class="step-no">02</div>
       <div>
         <h3>Photos</h3>
-        <p class="help">They run in this order in the strip. Add a short description to each photo for people using screen readers.</p>
+        <p class="help">They run in this order in the strip. Any shape works, at least 1200 px on the longest side. Add a short description to each photo for people using screen readers.</p>
         <div class="photos" id="e-photos"></div>
         <div class="add-row"><button type="button" class="pill small" id="e-add-photos">Add photos</button></div>
       </div>
@@ -636,9 +636,10 @@ var Projects = (function(){
     }).catch(function(){ order = []; items = {}; }).then(function(){ saved = order.slice(); reset(); });
   }
 
-  function wireDrop(el, get, set, label){
+  // hint: the recommended size shown under the label
+  function wireDrop(el, get, set, label, hint){
     var url = fileURL(dir(editing), get());
-    el.innerHTML = ICON_UP + '<strong>' + label + '</strong><span>Click or drop an image</span><button type="button" class="x" title="Remove image" aria-label="Remove image">✕</button>';
+    el.innerHTML = ICON_UP + '<strong>' + label + '</strong><span>' + (hint || 'Click or drop an image') + '</span><button type="button" class="x" title="Remove image" aria-label="Remove image">✕</button>';
     el.classList.toggle('has-img', !!url);
     el.style.backgroundImage = url ? "url('" + url + "')" : '';
     function take(f){
@@ -651,7 +652,7 @@ var Projects = (function(){
     el.ondrop = function(e){ e.preventDefault(); el.classList.remove('drag'); if(e.dataTransfer.files[0]) take(e.dataTransfer.files[0]); };
   }
   function render(){
-    wireDrop($('drop-card'), function(){ return draft.card; }, function(v){ draft.card = v; }, 'Add card image');
+    wireDrop($('drop-card'), function(){ return draft.card; }, function(v){ draft.card = v; }, 'Add card image', 'Portrait 2:3 · 1200 × 1800 px');
     var box = $('rows');
     if(!draft.gallery.length) box.innerHTML = '<div class="rows-empty">No image rows yet. Add a single landscape image or two images side by side.</div>';
     else box.innerHTML = draft.gallery.map(function(r, i){
@@ -664,7 +665,8 @@ var Projects = (function(){
     }).join('');
     [].forEach.call(box.querySelectorAll('.drop'), function(el){
       var row = +el.dataset.row, i = +el.dataset.i, r = draft.gallery[row];
-      wireDrop(el, function(){ return r.images[i]; }, function(v){ r.images[i] = v; }, r.type !== 'split' ? 'Add landscape image' : (i ? 'Add right image' : 'Add left image'));
+      wireDrop(el, function(){ return r.images[i]; }, function(v){ r.images[i] = v; }, r.type !== 'split' ? 'Add landscape image' : (i ? 'Add right image' : 'Add left image'),
+        r.type !== 'split' ? 'Landscape 16:10 · 2400 × 1500 px' : 'Portrait 4:5 · 1600 × 2000 px');
     });
     [].forEach.call(box.querySelectorAll('[data-move]'), function(b){ b.onclick = function(){
       var a = b.dataset.move.split(','), i = +a[0], j = i + +a[1], t = draft.gallery[i]; draft.gallery[i] = draft.gallery[j]; draft.gallery[j] = t; render();
@@ -800,7 +802,7 @@ var Events = (function(){
   // Logo: kept as uploaded (SVG or transparent PNG), never converted to JPEG
   function renderLogo(){
     var el = $('e-logo'), url = logo ? fileURL(dir(editing), logo.file) : '';
-    el.innerHTML = ICON_UP + '<strong>Add logo</strong><span>SVG or PNG</span><button type="button" class="x" title="Remove logo" aria-label="Remove logo">✕</button>';
+    el.innerHTML = ICON_UP + '<strong>Add logo</strong><span>SVG, or PNG about 400 px wide</span><button type="button" class="x" title="Remove logo" aria-label="Remove logo">✕</button>';
     el.classList.toggle('has-img', !!url);
     el.style.backgroundImage = url ? "url('" + url + "')" : '';
   }
