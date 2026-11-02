@@ -456,7 +456,8 @@ footer .foot-bottom{padding-top:20px; background:linear-gradient(rgba(244,239,23
 .foot-bottom p{margin:0; font-size:14px; color:var(--dark-muted);}
 .foot-top{padding:0; border:0; background:none; cursor:pointer; font:inherit; font-size:14px; color:var(--dark-muted); transition:color .2s ease;}
 .foot-top:hover{color:var(--dark-ink);}
-.foot-wordmark{margin-top:auto; padding-top:40px; width:100%; overflow:hidden;}
+.foot-wordmark{margin-top:auto; width:100%; overflow:hidden;}
+footer .foot-wordmark{padding-top:72px;} /* 'footer' raises it above .wrap's padding shorthand, which had cancelled it */
 .foot-wordmark svg{width:100%; height:auto; display:block; color:var(--dark-ink);}
 @media (max-width:700px){
   footer .wrap{padding:0 20px;}
@@ -509,5 +510,5 @@ footer .foot-bottom{padding-top:20px; background:linear-gradient(rgba(244,239,23
   .foot-ext{width:20px; height:20px;}
   .foot-bottom{margin-top:40px;}
   footer .foot-bottom{background:none; padding-top:0;}
-  footer .foot-wordmark{padding-top:48px;}
+  footer .foot-wordmark{padding-top:56px;}
 }

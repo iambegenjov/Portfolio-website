@@ -2,11 +2,13 @@
 
 import { useEffect, useRef } from 'react';
 
+// Focus, discipline and principles (owner asked for at most five)
 const SERVICES = [
-  ['Brand Identity', 'Name, mark, voice — built to be recognized.'],
-  ['Retail & Environments', 'Spaces that make premium feel earned.'],
-  ['Systems & Wayfinding', 'Clarity for brands that move things.'],
-  ['Digital Design', 'Interfaces that carry the same weight offline.'],
+  ['Brand Identity', 'My main focus: identities built on strategy, from the mark to the tone of voice.'],
+  ['Packaging & Editorial', 'Design that works as well in print and on the shelf as it does on screen.'],
+  ['Brand Architecture', 'Clear systems that keep every brand and sub-brand consistent as it grows.'],
+  ['Clarity First', 'One idea, said well. Nothing on the page without a reason to be there.'],
+  ['Discipline & Craft', 'Careful detail, honest timelines and work built to last beyond the launch.'],
 ];
 
 export default function Services() {
@@ -42,9 +44,9 @@ export default function Services() {
     <section className="services" id="services">
       <div className="wrap">
         <p className="eyebrow">
-          Services
+          Approach
         </p>
-        <h2>Four ways I help brands find their edge and hold on to it.</h2>
+        <h2>My focus, discipline and the principles behind the work.</h2>
 
         <div className="rows" ref={rowsRef} onMouseLeave={leave}>
           <span className="row-pill" ref={pillRef} aria-hidden="true" />
