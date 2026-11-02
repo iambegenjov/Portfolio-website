@@ -37,7 +37,7 @@ export default function Footer({ site }) {
         </a>
       </section>
 
-      <footer>
+      <footer id="contact">
         <div className="wrap foot-grid">
           {site.links.length > 0 && (
             <div className="foot-col">

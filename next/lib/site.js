@@ -39,9 +39,12 @@ export function getSite() {
       const href = toHref(l.url);
       return { label: l.label.trim(), href, external: !!href && (/^https?:/i.test(href) || href.includes('/files/')) };
     });
+  // The résumé for the hero button: an uploaded file, or a link labelled CV / Résumé
+  const cv = links.find((l) => l.href && l.href.includes('/files/')) || links.find((l) => l.href && /\b(cv|r[ée]sum[ée])\b/i.test(l.label));
   return {
     email: text(data.email, ''),
     links,
+    cv: cv ? cv.href : null,
     ctaHeading: text(data.ctaHeading, "Let's move forward with your next project"),
     ctaButton: text(data.ctaButton, 'Drop me a line ↘'),
   };

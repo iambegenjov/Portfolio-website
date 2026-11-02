@@ -40,6 +40,9 @@ export default function Nav() {
         <Link className="logo" href="/" aria-label="Muhammet Begenjov">
           <Logo className="logo-mark" />
         </Link>
+        <a className="nav-contact" href="#contact">
+          Contact
+        </a>
       </div>
     </nav>
   );

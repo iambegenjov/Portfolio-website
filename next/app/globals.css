@@ -52,6 +52,15 @@ nav.nav-hidden{ transform:translateY(-100%); }
 .logo-mark{height:28px; width:auto; color:var(--ink); transition:color .5s ease;}
 body.is-dark .logo-mark{color:var(--dark-ink);}
 @media (max-width:700px){ .logo-mark{height:25px;} }
+/* Contact in the header: a small outline pill that jumps to the footer links */
+.nav-contact{
+  padding:10px 20px; border:1px solid var(--line); border-radius:999px; font-size:14px; font-weight:500; line-height:1; color:var(--ink);
+  transition:background-color .2s ease, color .2s ease, border-color .2s ease;
+}
+.nav-contact:hover{background:var(--ink); color:var(--bg); border-color:var(--ink);}
+body.is-dark .nav-contact{color:var(--dark-ink); border-color:rgba(244,239,230,.3);}
+body.is-dark .nav-contact:hover{background:var(--dark-ink); color:var(--dark-bg); border-color:var(--dark-ink);}
+@media (max-width:700px){ .nav-contact{padding:9px 16px; font-size:13px;} }
 .burger{width:26px; height:14px; position:relative; cursor:pointer; background:none; border:none;}
 .burger span{position:absolute; left:0; width:100%; height:1.5px; background:var(--ink); transition:background-color .5s ease;}
 body.is-dark .burger span{background:var(--dark-ink);}
@@ -67,7 +76,7 @@ body.is-dark .burger span{background:var(--dark-ink);}
 .hero-cta{margin-top:40px;}
 .hero h1{
   font-size:clamp(24px, 3vw, 44px);
-  line-height:1.12;
+  line-height:1.2;
   max-width:1000px;
   text-wrap:balance;
 }
@@ -391,13 +400,15 @@ body.is-dark .about h2{color:var(--dark-ink);}
 }
 .rotator-word{display:block; position:absolute; left:0; top:0; height:1.3em; overflow:hidden; white-space:nowrap;}
 .rotator-word{color:var(--muted);} /* softer than the sentence, like the hero's second line */
-.rotator-sizer{visibility:hidden; white-space:nowrap;} /* gives the slot its first width before the script measures it */
+.rotator-sizer{visibility:hidden; white-space:nowrap;}
+/* Centred line (hero): words anchored on the slot's centre, which stays put while its width changes, so they rise straight up */
+.hero .rotator-word{left:50%; transform:translateX(-50%);} /* gives the slot its first width before the script measures it */
 .rotator-part{display:inline-block; margin-right:.25em; transform:translateY(110%);}
 .rotator-part:last-child{margin-right:0;}
 .rotator-word.is-in .rotator-part{transform:none; transition:transform .55s cubic-bezier(.65,0,.35,1) calc(.15s + var(--k) * .12s);}
 .rotator-word.is-out .rotator-part{transform:translateY(-110%); transition:transform .5s cubic-bezier(.65,0,.35,1) calc(var(--k) * .12s);}
 /* Phones: the name gets its own line, so the longest one still fits */
-@media (max-width:700px){ .about h2 .nowrap{white-space:normal;} .rotator{display:block; width:auto !important;} }
+@media (max-width:700px){ .about h2 .nowrap{white-space:normal;} .about .rotator{display:block; width:auto !important;} }
 .about .eyebrow{color:var(--muted); transition:color .5s ease;}
 body.is-dark .about .eyebrow{color:var(--dark-muted);}
 .back-top{
@@ -460,7 +471,7 @@ footer .foot-bottom{padding-top:20px; background:linear-gradient(rgba(244,239,23
 @media (max-width:700px){
   .hero{min-height:78svh;}
   .hero-inner{padding-top:64px; padding-bottom:40px;}
-  .hero h1{font-size:clamp(26px,7.4vw,32px); line-height:1.12; text-wrap:balance;}
+  .hero h1{font-size:clamp(26px,7.4vw,32px); line-height:1.2; text-wrap:balance;}
   .chip-rows{margin-top:18px; gap:10px;}
   .chips{gap:8px 20px; font-size:14px;}
 
