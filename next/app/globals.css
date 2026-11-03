@@ -351,6 +351,7 @@ body.is-dark .events-story p{color:var(--dark-ink);}
 .moments-stage{
   --h-small:150px; --h-big:min(58vh, 560px); --w-big:min(34vw, 500px); /* a popped-up photo fits inside h-big × w-big */
   margin-top:56px; height:var(--h-big); display:flex; align-items:center; overflow:hidden;
+  contain:layout paint; /* a photo popping up only re-lays out the strip, not the page */
 }
 .moments-stage.is-manual{overflow-x:auto; scrollbar-width:none; padding:0 max(40px, calc((100% - 1400px) / 2 + 40px));}
 .moments-stage::-webkit-scrollbar{display:none;}

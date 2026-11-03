@@ -59,6 +59,9 @@ export default function Events({ event, first }) {
 
     let raf = 0;
     let last = 0;
+    let lastCheck = 0;
+    let lastMeasure = 0;
+    let setWidth = 0;
     const tick = (time) => {
       raf = requestAnimationFrame(tick);
       const dt = last ? Math.min(0.05, (time - last) / 1000) : 0;
@@ -68,7 +71,9 @@ export default function Events({ event, first }) {
         const under = document.elementFromPoint(pointer.x, pointer.y);
         const hit = under && under.closest('.moment');
         if (!hit || !hit.classList.contains('is-active')) setActive(hit && track.contains(hit) ? hit : null);
-      } else if (touch) {
+      } else if (touch && time - lastCheck > 150) {
+        // Phones: look for the photo in the middle a few times a second, not every frame (cheaper, no flicker)
+        lastCheck = time;
         const r = stage.getBoundingClientRect();
         const y = r.top + r.height / 2;
         if (y > innerHeight * 0.2 && y < innerHeight * 0.8) {
@@ -79,12 +84,18 @@ export default function Events({ event, first }) {
           setActive(null);
         }
       }
-      // A popped-up photo changes the width of its set, so measure every frame
-      const all = track.children;
-      const setWidth = all[photos.length].offsetLeft - all[0].offsetLeft;
+      // A popped-up photo changes the width of its set; re-measuring a few times a second is enough
+      if (!setWidth || time - lastMeasure > 200) {
+        lastMeasure = time;
+        const all = track.children;
+        setWidth = all[photos.length].offsetLeft - all[0].offsetLeft;
+      }
       if (setWidth) {
         offset -= SPEED * dt;
-        if (offset <= -setWidth) offset += setWidth;
+        if (offset <= -setWidth) {
+          setWidth = track.children[photos.length].offsetLeft - track.children[0].offsetLeft; // exact value for the seamless jump
+          if (offset <= -setWidth) offset += setWidth;
+        }
         track.style.transform = `translate3d(${offset}px,0,0)`;
       }
     };
@@ -135,7 +146,7 @@ export default function Events({ event, first }) {
           {Array.from({ length: sets }).flatMap((_, c) =>
             photos.map((m, i) => (
               <figure className="moment" key={`${c}-${i}`} style={{ '--r': m.ratio }} aria-hidden={c > 0 ? 'true' : undefined}>
-                <img src={m.src} alt={c > 0 ? '' : m.alt} loading={c > 0 ? 'lazy' : undefined} draggable="false" />
+                <img src={m.src} alt={c > 0 ? '' : m.alt} loading={c > 0 ? 'lazy' : undefined} decoding="async" draggable="false" />
               </figure>
             ))
           )}
