@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from './SiteLink';
 import Arrow from './Arrow';
 
-const VISIBLE = 3; // paragraphs shown before "Read more"
+const VISIBLE = 2; // paragraphs shown before "Read more"
 
 // Project page, modelled on fiasco.design/work/boundless (without the cover photo, owner removed it):
 // title and text on the left, labelled pills on the right, then the image rows.
