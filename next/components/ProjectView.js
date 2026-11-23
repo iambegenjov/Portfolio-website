@@ -88,9 +88,9 @@ export default function ProjectView({ project: p, next }) {
           <div className="pj-gallery">
             {p.rows.map((r, i) => (
               <div className={'pj-row pj-row--' + r.type} key={i}>
-                {r.images.map((src, k) => (
-                  <div className="pj-img" role="img" aria-label={p.title} key={k}>
-                    <div className="pj-img-pic" style={{ backgroundImage: `url('${src}')` }} />
+                {r.images.map((im, k) => (
+                  <div className="pj-img" key={k}>
+                    <img className="pj-img-pic" src={im.src} alt={p.title} loading="lazy" decoding="async" style={im.ratio ? { aspectRatio: im.ratio } : undefined} />
                   </div>
                 ))}
               </div>

@@ -310,16 +310,14 @@ a.card{display:block; color:inherit;}
    or two images side by side; admin.html picks the layout per row. */
 .pj-gallery{display:flex; flex-direction:column; gap:16px; margin:110px 15.2% 0; /* same side margins as the intro text and Next project */}
 .pj-row--split{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+/* Pairs keep the even 4:5 frames, photos filling them (single rows show the whole photo) */
+.pj-row--split .pj-img{aspect-ratio:4/5;}
+.pj-row--split .pj-img-pic{height:100%; object-fit:cover; aspect-ratio:auto !important;}
 .pj-img{
   position:relative; overflow:hidden;
   border-radius:16px; background-color:rgba(21,16,12,.06);
 }
-.pj-img-pic{
-  position:absolute; inset:0;
-  background-size:cover; background-position:center;
-}
-.pj-row--single .pj-img{aspect-ratio:16/10;}
-.pj-row--split .pj-img{aspect-ratio:4/5;}
+.pj-img-pic{display:block; width:100%; height:auto;} /* whole photo at its own shape, never cropped */
 @media (max-width:800px){
   .pj-gallery{margin:70px 20px 0; gap:12px;}
   .pj-row--split{gap:8px;} /* pairs stay side by side, as on desktop */

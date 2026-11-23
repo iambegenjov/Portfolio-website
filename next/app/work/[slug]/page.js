@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import ProjectView from '@/components/ProjectView';
-import { getProjects, projectImage, paragraphs } from '@/lib/projects';
+import { getProjects, projectImage, imageRatio, paragraphs } from '@/lib/projects';
 
 export const dynamicParams = false;
 
@@ -37,7 +37,7 @@ export default async function ProjectPage({ params }) {
     cardUrl: projectImage(p, p.card),
     rows: (p.gallery || []).map((r) => ({
       type: r.type === 'split' ? 'split' : 'single',
-      images: (r.images || []).map((f) => projectImage(p, f)),
+      images: (r.images || []).map((f) => ({ src: projectImage(p, f), ratio: imageRatio(p, f) })),
     })),
   };
 
