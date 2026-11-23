@@ -35,6 +35,13 @@
       "images": [
         "gallery-mvwv5gfm-3.jpg"
       ]
+    },
+    {
+      "type": "split",
+      "images": [
+        "gallery-mwtc2214-0.jpg",
+        "gallery-mwtc2214-1.jpg"
+      ]
     }
   ]
 }
